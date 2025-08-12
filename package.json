@@ -1,0 +1,65 @@
+{
+	"name": "ai-motion",
+	"version": "0.1.0",
+	"private": false,
+	"license": "MIT",
+	"type": "module",
+	"description": "A minimal WebGL2 ESM library for AI-style motion mask animation.",
+	"main": "dist/motion.js",
+	"module": "dist/motion.js",
+	"types": "dist/Motion.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/motion.js",
+			"types": "./dist/Motion.d.ts"
+		}
+	},
+	"sideEffects": false,
+	"scripts": {
+		"dev": "vite -c vite.demo.config.ts",
+		"build:demo": "vite build -c vite.demo.config.ts",
+		"preview:demo": "vite preview -c vite.demo.config.ts",
+		"build:lib": "vite build -c vite.lib.config.ts",
+		"build:types": "tsc --emitDeclarationOnly",
+		"build": "npm run build:lib && npm run build:types",
+		"typecheck": "tsc -noEmit",
+		"prepare": "husky install"
+	},
+	"devDependencies": {
+		"@commitlint/cli": "^19.8.1",
+		"@commitlint/config-conventional": "^19.8.1",
+		"@trivago/prettier-plugin-sort-imports": "^5.2.2",
+		"eslint": "^9.33.0",
+		"eslint-config-prettier": "^10.1.8",
+		"eslint-plugin-prettier": "^5.5.4",
+		"husky": "^9.1.7",
+		"lint-staged": "^16.1.5",
+		"prettier": "^3.6.2",
+		"typescript": "^5.9.2",
+		"vite": "^7.1.2"
+	},
+	"lint-staged": {
+		"*.{js,ts,cjs,cts,mjs,mts}": [
+			"npx prettier --write --ignore-unknown",
+			"npx eslint --quiet"
+		],
+		"*.{jsx,tsx}": [
+			"npx prettier --write --ignore-unknown",
+			"npx eslint --quiet"
+		],
+		"*.css": [
+			"npx prettier --write --ignore-unknown"
+		]
+	},
+	"commitlint": {
+		"extends": [
+			"@commitlint/config-conventional"
+		],
+		"rules": {
+			"subject-case": [
+				0,
+				"never"
+			]
+		}
+	}
+}
