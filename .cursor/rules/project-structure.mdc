@@ -1,0 +1,43 @@
+---
+alwaysApply: true
+---
+# ai-motion Project Structure and Constraints
+
+- Entry point is [src/lib/Motion.ts](mdc:src/lib/Motion.ts). Single public class `Motion` exposing:
+  - `element: HTMLDivElement` wrapper (not auto-appended)
+  - `start()` to begin rendering
+  - `resize(width: number, height: number, ratio?: number)` to size the canvas (ratio defaults to devicePixelRatio)
+  - `dispose()` to tear down
+
+- WebGL code is organized under one folder [src/lib/gl](mdc:src/lib/gl):
+  - Shader compile/link helper
+  - Border-only geometry generator (8 triangles)
+  - Shader sources
+
+- Demo site under [src/pages](mdc:src/pages/): blank page for local testing ([index.html](mdc:src/pages/index.html), [main.ts](mdc:src/pages/main.ts)).
+
+- Build configs:
+  - [vite.lib.config.ts](mdc:vite.lib.config.ts): ESM-only library build → `dist/motion.js`
+  - [vite.demo.config.ts](mdc:vite.demo.config.ts): demo build → `demo-dist/`
+
+- Packaging:
+  - ESM-only (no UMD/IIFE). See [package.json](mdc:package.json)
+  - Type declarations emitted to `dist/` (e.g., `dist/Motion.d.ts`)
+  - License: MIT (see [LICENSE](mdc:LICENSE))
+
+## Behavioral constraints
+
+- WebGL2 only. No WebGL1 fallback.
+- No runtime deps (no React/ThreeJS). Pure TS/JS + modern Web APIs.
+- Canvas fills the wrapper. Do not auto-append to `document.body`.
+- Do not change or capture global pointer events.
+- Render only the border area (four rectangles = eight triangles); do not draw the center.
+- UV coordinates should cover the full canvas in the unit square [0,1]. Default fragment shows a simple UV test map.
+- Defaults: `borderWidth` 8 (max 20), `glowWidth` 100. Clamp total thickness (border + glow) to the short canvas side.
+- DPR control via `ratio` (can be < 1 for performance).
+
+## Editing guidance
+
+- Keep the single-class API stable. Add new features behind options or uniforms without breaking the API.
+- Keep helpers modular but under the single `gl/` folder.
+- Prefer extending the fragment shader for animation; avoid leaking implementation details into the public API.
