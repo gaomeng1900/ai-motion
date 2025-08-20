@@ -8,6 +8,7 @@ export type MotionOptions = {
 	ratio?: number // DPR multiplier; can be < 1
 	borderWidth?: number // default 8
 	glowWidth?: number // default 100
+	borderRadius?: number // default 0
 	classNames?: { wrapper?: string; canvas?: string }
 	styles?: {
 		wrapper?: Partial<CSSStyleDeclaration>
@@ -25,14 +26,17 @@ type GLResources = {
 	uTime: WebGLUniformLocation | null
 	uBorderWidth: WebGLUniformLocation | null
 	uGlowWidth: WebGLUniformLocation | null
+	uBorderRadius: WebGLUniformLocation | null
 }
 
 export class Motion {
 	public readonly element: HTMLDivElement
 
 	private canvas: HTMLCanvasElement
-	private options: Required<Pick<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth'>> &
-		Omit<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth'>
+	private options: Required<
+		Pick<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth' | 'borderRadius'>
+	> &
+		Omit<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth' | 'borderRadius'>
 	private running = false
 	private startTime = 0
 	private rafId: number | null = null
@@ -43,6 +47,7 @@ export class Motion {
 			ratio: options.ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
 			borderWidth: options.borderWidth ?? 8,
 			glowWidth: options.glowWidth ?? 100,
+			borderRadius: options.borderRadius ?? 0,
 			...options,
 		}
 
@@ -88,6 +93,7 @@ export class Motion {
 		gl.viewport(0, 0, this.canvas.width, this.canvas.height)
 		gl.useProgram(this.glr.program)
 		gl.uniform2f(this.glr.uResolution, this.canvas.width, this.canvas.height)
+		this.checkGLError(gl, 'start: after initial setup')
 
 		const loop = () => {
 			if (!this.running || !this.glr) return
@@ -112,11 +118,45 @@ export class Motion {
 		}
 	}
 
+	private checkGLError(gl: WebGL2RenderingContext, context: string): void {
+		let error = gl.getError()
+		if (error !== gl.NO_ERROR) {
+			console.group(`🔴 WebGL Error in ${context}`)
+			while (error !== gl.NO_ERROR) {
+				const errorName = this.getGLErrorName(gl, error)
+				console.error(`${errorName} (0x${error.toString(16)})`)
+				error = gl.getError()
+			}
+			console.groupEnd()
+		}
+	}
+
+	private getGLErrorName(gl: WebGL2RenderingContext, error: GLenum): string {
+		switch (error) {
+			case gl.INVALID_ENUM:
+				return 'INVALID_ENUM'
+			case gl.INVALID_VALUE:
+				return 'INVALID_VALUE'
+			case gl.INVALID_OPERATION:
+				return 'INVALID_OPERATION'
+			case gl.INVALID_FRAMEBUFFER_OPERATION:
+				return 'INVALID_FRAMEBUFFER_OPERATION'
+			case gl.OUT_OF_MEMORY:
+				return 'OUT_OF_MEMORY'
+			case gl.CONTEXT_LOST_WEBGL:
+				return 'CONTEXT_LOST_WEBGL'
+			default:
+				return 'UNKNOWN_ERROR'
+		}
+	}
+
 	private setupGL(gl: WebGL2RenderingContext): GLResources {
 		const program = createProgram(gl, vertexShaderSource, fragmentShaderSource)
+		this.checkGLError(gl, 'setupGL: after createProgram')
 
 		const vao = gl.createVertexArray()
 		gl.bindVertexArray(vao)
+		this.checkGLError(gl, 'setupGL: after VAO creation')
 
 		// Build geometry: border-only with four rectangles (8 triangles)
 		const pw = this.canvas.width || 2
@@ -135,6 +175,7 @@ export class Motion {
 		const aPosition = gl.getAttribLocation(program, 'aPosition')
 		gl.enableVertexAttribArray(aPosition)
 		gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'setupGL: after position buffer setup')
 
 		const uvBuffer = gl.createBuffer()
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer)
@@ -143,15 +184,19 @@ export class Motion {
 		const aUV = gl.getAttribLocation(program, 'aUV')
 		gl.enableVertexAttribArray(aUV)
 		gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'setupGL: after UV buffer setup')
 
 		const uResolution = gl.getUniformLocation(program, 'uResolution')
 		const uTime = gl.getUniformLocation(program, 'uTime')
 		const uBorderWidth = gl.getUniformLocation(program, 'uBorderWidth')
 		const uGlowWidth = gl.getUniformLocation(program, 'uGlowWidth')
+		const uBorderRadius = gl.getUniformLocation(program, 'uBorderRadius')
 
 		gl.useProgram(program)
 		gl.uniform1f(uBorderWidth, this.options.borderWidth)
 		gl.uniform1f(uGlowWidth, this.options.glowWidth)
+		gl.uniform1f(uBorderRadius, this.options.borderRadius)
+		this.checkGLError(gl, 'setupGL: after uniform setup')
 
 		gl.bindVertexArray(null)
 		gl.bindBuffer(gl.ARRAY_BUFFER, null)
@@ -166,6 +211,7 @@ export class Motion {
 			uTime,
 			uBorderWidth,
 			uGlowWidth,
+			uBorderRadius,
 		}
 	}
 
@@ -183,6 +229,7 @@ export class Motion {
 		}
 
 		gl.viewport(0, 0, this.canvas.width, this.canvas.height)
+		this.checkGLError(gl, 'resize: after viewport setup')
 
 		// Rebuild geometry for current size
 		const { positions, uvs } = computeBorderGeometry(
@@ -199,36 +246,41 @@ export class Motion {
 		const aPosition = gl.getAttribLocation(program, 'aPosition')
 		gl.enableVertexAttribArray(aPosition)
 		gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'resize: after position buffer update')
 
 		gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer)
 		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW)
 		const aUV = gl.getAttribLocation(program, 'aUV')
 		gl.enableVertexAttribArray(aUV)
 		gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'resize: after UV buffer update')
 
 		gl.useProgram(program)
 		gl.uniform2f(uResolution, this.canvas.width, this.canvas.height)
 		gl.uniform1f(this.glr.uBorderWidth, this.options.borderWidth)
 		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth)
+		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius)
+		this.checkGLError(gl, 'resize: after uniform updates')
 	}
 
 	private render(t: number): void {
 		if (!this.glr) return
 		const { gl, program, vao, uTime } = this.glr
 
-		gl.useProgram(program)
-		gl.bindVertexArray(vao)
+		gl.useProgram(program) // @todo optimize
+		gl.bindVertexArray(vao) // @todo optimize
 		gl.uniform1f(uTime, t)
 
-		gl.disable(gl.DEPTH_TEST)
-		gl.disable(gl.CULL_FACE)
-		gl.disable(gl.BLEND)
-		gl.clearColor(0, 0, 0, 0)
+		gl.disable(gl.DEPTH_TEST) // @todo optimize
+		gl.disable(gl.CULL_FACE) // @todo optimize
+		gl.disable(gl.BLEND) // @todo optimize
+		gl.clearColor(0, 0, 0, 0) // @todo optimize
 		gl.clear(gl.COLOR_BUFFER_BIT)
 
 		// Draw 24 vertices (8 triangles)
 		gl.drawArrays(gl.TRIANGLES, 0, 24)
+		this.checkGLError(gl, 'render: after draw call')
 
-		gl.bindVertexArray(null)
+		gl.bindVertexArray(null) // @todo optimize
 	}
 }

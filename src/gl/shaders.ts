@@ -16,14 +16,13 @@ uniform vec2 uResolution;
 uniform float uTime;
 uniform float uBorderWidth;
 uniform float uGlowWidth;
+uniform float uBorderRadius;
 void main() {
-  // UV test map: checker + gradient
+  // UV gradient map
   vec2 uv = vUV;
-  vec2 grid = floor(fract(uv * 10.0) * 2.0);
-  float checker = mod(grid.x + grid.y, 2.0);
   vec3 base = mix(vec3(0.1, 0.2, 0.9), vec3(0.9, 0.2, 0.1), uv.x);
   base = mix(base, vec3(0.1, 0.9, 0.2), uv.y);
-  vec3 color = mix(base, vec3(1.0), checker * 0.15);
+  vec3 color = base;
   outColor = vec4(color, 1.0);
 }
 `
