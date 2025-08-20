@@ -17,7 +17,7 @@
 		"declaration": true,
 		"declarationMap": true,
 		"sourceMap": true,
-		"outDir": "dist"
+		"outDir": "build"
 	},
-	"include": ["src/lib/**/*.ts"]
+	"include": ["src/**/*.ts"]
 }

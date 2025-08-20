@@ -3,7 +3,7 @@ import { defineConfig } from 'vite'
 export default defineConfig({
 	build: {
 		lib: {
-			entry: 'src/lib/Motion.ts',
+			entry: 'src/Motion.ts',
 			name: 'Motion',
 			formats: ['es'],
 			fileName: () => 'motion.js',
@@ -12,7 +12,7 @@ export default defineConfig({
 		rollupOptions: {
 			// No external deps
 		},
-		outDir: 'dist',
+		outDir: 'build',
 		emptyOutDir: true,
 		target: 'es2019',
 	},

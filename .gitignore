@@ -139,4 +139,5 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
 
-demo-dist/
+build/
+build-demo/

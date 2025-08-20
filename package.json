@@ -5,17 +5,18 @@
 	"license": "MIT",
 	"type": "module",
 	"description": "A minimal WebGL2 ESM library for AI-style motion mask animation.",
-	"main": "dist/motion.js",
-	"module": "dist/motion.js",
-	"types": "dist/Motion.d.ts",
+	"main": "build/motion.js",
+	"module": "build/motion.js",
+	"types": "build/Motion.d.ts",
 	"exports": {
 		".": {
-			"import": "./dist/motion.js",
-			"types": "./dist/Motion.d.ts"
+			"import": "./build/motion.js",
+			"types": "./build/Motion.d.ts"
 		}
 	},
 	"sideEffects": false,
 	"scripts": {
+		"start": "npm run dev",
 		"dev": "vite -c vite.demo.config.ts",
 		"build:demo": "vite build -c vite.demo.config.ts",
 		"preview:demo": "vite preview -c vite.demo.config.ts",

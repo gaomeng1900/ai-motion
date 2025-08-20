@@ -1,4 +1,4 @@
-import { Motion } from '../lib/Motion'
+import { Motion } from '../src/Motion.js'
 
 // Minimal demo with auto-resize for the container
 const app = document.getElementById('app')
