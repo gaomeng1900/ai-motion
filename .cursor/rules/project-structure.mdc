@@ -3,18 +3,18 @@ alwaysApply: true
 ---
 # ai-motion Project Structure and Constraints
 
-- Entry point is [src/lib/Motion.ts](mdc:src/lib/Motion.ts). Single public class `Motion` exposing:
+- Entry point is [src/Motion.ts](mdc:src/Motion.ts). Single public class `Motion` exposing:
   - `element: HTMLDivElement` wrapper (not auto-appended)
   - `start()` to begin rendering
   - `resize(width: number, height: number, ratio?: number)` to size the canvas (ratio defaults to devicePixelRatio)
   - `dispose()` to tear down
 
-- WebGL code is organized under one folder [src/lib/gl](mdc:src/lib/gl):
+- WebGL code is organized under one folder [src/gl](mdc:src/gl):
   - Shader compile/link helper
   - Border-only geometry generator (8 triangles)
   - Shader sources
 
-- Demo site under [src/pages](mdc:src/pages/): blank page for local testing ([index.html](mdc:src/pages/index.html), [main.ts](mdc:src/pages/main.ts)).
+- Demo site under [pages](mdc:pages/): blank page for local testing ([index.html](mdc:pages/index.html), [main.ts](mdc:pages/main.ts)).
 
 - Build configs:
   - [vite.lib.config.ts](mdc:vite.lib.config.ts): ESM-only library build → `dist/motion.js`

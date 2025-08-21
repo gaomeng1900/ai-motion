@@ -19,11 +19,9 @@
 		"start": "npm run dev",
 		"dev": "vite -c vite.demo.config.ts",
 		"build:demo": "vite build -c vite.demo.config.ts",
-		"preview:demo": "vite preview -c vite.demo.config.ts",
 		"build:lib": "vite build -c vite.lib.config.ts",
 		"build:types": "tsc --emitDeclarationOnly",
 		"build": "npm run build:lib && npm run build:types",
-		"typecheck": "tsc -noEmit",
 		"prepare": "husky install"
 	},
 	"devDependencies": {
