@@ -8,7 +8,7 @@ export type MotionOptions = {
 	ratio?: number // DPR multiplier; can be < 1
 	borderWidth?: number // default 8
 	glowWidth?: number // default 100
-	borderRadius?: number // default 0
+	borderRadius?: number // default 8
 	classNames?: { wrapper?: string; canvas?: string }
 	styles?: {
 		wrapper?: Partial<CSSStyleDeclaration>
@@ -29,6 +29,11 @@ type GLResources = {
 	uBorderRadius: WebGLUniformLocation | null
 }
 
+/**
+ * default light colors
+ */
+const COLORS = ['rgb(57, 182, 255)', 'rgb(189, 69, 251)', 'rgb(255, 87, 51)', 'rgb(255, 214, 0)']
+
 export class Motion {
 	public readonly element: HTMLDivElement
 
@@ -47,7 +52,7 @@ export class Motion {
 			ratio: options.ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
 			borderWidth: options.borderWidth ?? 8,
 			glowWidth: options.glowWidth ?? 100,
-			borderRadius: options.borderRadius ?? 0,
+			borderRadius: options.borderRadius ?? 8,
 			...options,
 		}
 
@@ -80,7 +85,7 @@ export class Motion {
 
 	public start(): void {
 		if (this.running) return
-		const gl = this.canvas.getContext('webgl2', { antialias: false })
+		const gl = this.canvas.getContext('webgl2', { antialias: false, alpha: true })
 		if (!gl) {
 			throw new Error('WebGL2 is required but not available.')
 		}
