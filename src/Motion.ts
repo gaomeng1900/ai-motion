@@ -27,12 +27,25 @@ type GLResources = {
 	uBorderWidth: WebGLUniformLocation | null
 	uGlowWidth: WebGLUniformLocation | null
 	uBorderRadius: WebGLUniformLocation | null
+	uColors: WebGLUniformLocation | null
 }
 
 /**
  * default light colors
  */
 const COLORS = ['rgb(57, 182, 255)', 'rgb(189, 69, 251)', 'rgb(255, 87, 51)', 'rgb(255, 214, 0)']
+
+/**
+ * Parse CSS color string to normalized RGB vec3
+ */
+function parseColor(colorStr: string): [number, number, number] {
+	const match = colorStr.match(/rgb\((\d+),\s*(\d+),\s*(\d+)\)/)
+	if (!match) {
+		throw new Error(`Invalid color format: ${colorStr}`)
+	}
+	const [, r, g, b] = match
+	return [parseInt(r) / 255, parseInt(g) / 255, parseInt(b) / 255]
+}
 
 export class Motion {
 	public readonly element: HTMLDivElement
@@ -196,11 +209,18 @@ export class Motion {
 		const uBorderWidth = gl.getUniformLocation(program, 'uBorderWidth')
 		const uGlowWidth = gl.getUniformLocation(program, 'uGlowWidth')
 		const uBorderRadius = gl.getUniformLocation(program, 'uBorderRadius')
+		const uColors = gl.getUniformLocation(program, 'uColors')
 
 		gl.useProgram(program)
 		gl.uniform1f(uBorderWidth, this.options.borderWidth)
 		gl.uniform1f(uGlowWidth, this.options.glowWidth)
 		gl.uniform1f(uBorderRadius, this.options.borderRadius)
+
+		// Set color uniforms
+		const colorVecs = COLORS.map(parseColor)
+		for (let i = 0; i < colorVecs.length; i++) {
+			gl.uniform3f(gl.getUniformLocation(program, `uColors[${i}]`), ...colorVecs[i])
+		}
 		this.checkGLError(gl, 'setupGL: after uniform setup')
 
 		gl.bindVertexArray(null)
@@ -217,6 +237,7 @@ export class Motion {
 			uBorderWidth,
 			uGlowWidth,
 			uBorderRadius,
+			uColors,
 		}
 	}
 

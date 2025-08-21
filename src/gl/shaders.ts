@@ -38,6 +38,7 @@ uniform float uTime;
 uniform float uBorderWidth;
 uniform float uGlowWidth;
 uniform float uBorderRadius;
+uniform vec3 uColors[4];
 
 /**
  * Derivative-based Anti-aliasing
@@ -75,7 +76,8 @@ void main() {
 	// UV gradient map
 	vec3 test = vec3(vUV, 0.0);
 	// test = vec3(isBorder, 0.0, 0.0);
-	test = vec3(isBox, 0.0, 0.0);
+	// test = vec3(isBox, 0.0, 0.0);
+	test = vec3(mix(uColors[0], uColors[1], isBox));
 
 	vec3 color = test;
 	outColor = vec4(color, 1.0);
