@@ -19,5 +19,6 @@
 		"sourceMap": true,
 		"outDir": "build"
 	},
-	"include": ["src/**/*.ts"]
+	"include": ["src/**/*.ts"],
+	"exclude": ["src/**/__*.ts"]
 }
