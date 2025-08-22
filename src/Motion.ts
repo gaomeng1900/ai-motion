@@ -1,6 +1,11 @@
-import { computeBorderGeometry } from './gl/border'
 import { createProgram } from './gl/createProgram'
+import { computeBorderGeometry } from './gl/geometry'
 import { fragmentShaderSource, vertexShaderSource } from './gl/shaders'
+
+console.log(
+	`%c🌈 AI Motion ${(window as any).__AI_MOTION_VERSION__ || ''} 🌈`,
+	'background: linear-gradient(90deg, #39b6ff, #bd45fb, #ff5733, #ffd600); color: white; text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); font-weight: bold; font-size: 1em; padding: 2px 12px; border-radius: 6px;'
+)
 
 export type MotionOptions = {
 	/**
@@ -28,7 +33,7 @@ export type MotionOptions = {
 	mode?: 'dark' | 'light'
 	/**
 	 * The width of the border.
-	 * @default 10
+	 * @default 8
 	 */
 	borderWidth?: number
 	/**
@@ -39,7 +44,7 @@ export type MotionOptions = {
 	glowWidth?: number
 	/**
 	 * The border radius.
-	 * @default 12
+	 * @default 8
 	 */
 	borderRadius?: number
 	/**
@@ -102,10 +107,10 @@ export class Motion {
 
 	constructor(options: MotionOptions = {}) {
 		this.options = {
-			ratio: options.ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
-			borderWidth: options.borderWidth ?? 10,
+			ratio: options.ratio ?? window.devicePixelRatio ?? 1,
+			borderWidth: options.borderWidth ?? 8,
 			glowWidth: options.glowWidth ?? 200,
-			borderRadius: options.borderRadius ?? 16,
+			borderRadius: options.borderRadius ?? 8,
 			mode: options.mode ?? 'light',
 			...options,
 		}
@@ -138,10 +143,11 @@ export class Motion {
 		this.canvas.style.pointerEvents = 'none'
 		this.element.appendChild(this.canvas)
 
+		this.start()
 		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
 	}
 
-	public start(): void {
+	private start(): void {
 		if (this.running) return
 		const gl = this.canvas.getContext('webgl2', { antialias: false, alpha: true })
 		if (!gl) {
@@ -304,13 +310,18 @@ export class Motion {
 	}
 
 	public resize(width: number, height: number, ratio?: number): void {
-		if (!this.glr) return
+		if (!this.glr) {
+			console.warn('WebGL context not initialized. Resize will be ignored.')
+			return
+		}
 		const { gl, program, vao, positionBuffer, uvBuffer, uResolution } = this.glr
 
-		const dpr = ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1)
+		const dpr = ratio ?? this.options.ratio ?? window.devicePixelRatio ?? 1
 		const desiredWidth = Math.max(1, Math.floor(width * dpr))
 		const desiredHeight = Math.max(1, Math.floor(height * dpr))
 
+		this.canvas.style.width = `${width}px`
+		this.canvas.style.height = `${height}px`
 		if (this.canvas.width !== desiredWidth || this.canvas.height !== desiredHeight) {
 			this.canvas.width = desiredWidth
 			this.canvas.height = desiredHeight
@@ -323,8 +334,8 @@ export class Motion {
 		const { positions, uvs } = computeBorderGeometry(
 			this.canvas.width,
 			this.canvas.height,
-			this.options.borderWidth,
-			this.options.glowWidth
+			this.options.borderWidth * dpr,
+			this.options.glowWidth * dpr
 		)
 
 		gl.bindVertexArray(vao)
@@ -345,9 +356,9 @@ export class Motion {
 
 		gl.useProgram(program)
 		gl.uniform2f(uResolution, this.canvas.width, this.canvas.height)
-		gl.uniform1f(this.glr.uBorderWidth, this.options.borderWidth)
-		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth)
-		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius)
+		gl.uniform1f(this.glr.uBorderWidth, this.options.borderWidth * dpr)
+		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth * dpr)
+		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius * dpr)
 		this.checkGLError(gl, 'resize: after uniform updates')
 
 		// Render a frame immediately after resize

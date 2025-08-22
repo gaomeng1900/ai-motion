@@ -15,4 +15,7 @@ export default defineConfig({
 		sourcemap: true,
 	},
 	publicDir: false,
+	define: {
+		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
+	},
 })
