@@ -37,7 +37,7 @@ export type MotionOptions = {
 	glowWidth?: number
 	/**
 	 * The border radius.
-	 * @default 10
+	 * @default 12
 	 */
 	borderRadius?: number
 	/**
@@ -103,7 +103,7 @@ export class Motion {
 			ratio: options.ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
 			borderWidth: options.borderWidth ?? 10,
 			glowWidth: options.glowWidth ?? 200,
-			borderRadius: options.borderRadius ?? 10,
+			borderRadius: options.borderRadius ?? 16,
 			...options,
 		}
 

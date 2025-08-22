@@ -10,7 +10,7 @@ const motion = new Motion({
 	styles: {
 		wrapper: { width: '100%', height: '100%' },
 	},
-	mode: 'light',
+	mode: 'dark',
 })
 
 app.appendChild(motion.element)

@@ -231,7 +231,7 @@ void main() {
 	glowColor += uColors[2] * intensityGlow[2] * breath.z;
 	glowColor += uColors[3] * intensityGlow[3] * breath.w * glow;
 
-	// mix
+	// 💿 mix
 
 	glow = pow(glow, uGlowExponent);
 	glow *= random(pos + uTime) * 0.1 + 1.0; // 🧚‍♀️ 🤏
@@ -240,7 +240,10 @@ void main() {
 
 	vec3 color = mix(glowColor, borderColor + glowColor * 0.2, border);
 
-	float alpha = clamp(border + glow, 0.0, 1.0);
+	// @fix anti-aliased border
+	// float alpha = clamp(border + glow, 0.0, 1.0);
+	// float alpha = clamp(max(border, glow), 0.0, 1.0);
+	float alpha = mix(glow, 1.0, border);
 
 	outColor = vec4(color, alpha);
 }
