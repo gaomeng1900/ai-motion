@@ -94,6 +94,7 @@ export class Motion {
 		Omit<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth' | 'borderRadius'>
 	private running = false
 	private startTime = 0
+	private lastTime = 0
 	private rafId: number | null = null
 	private glr?: GLResources
 
@@ -112,6 +113,7 @@ export class Motion {
 		}
 
 		this.element = document.createElement('div')
+		this.element.style.pointerEvents = 'none'
 		if (this.options.classNames?.wrapper) {
 			this.element.className = this.options.classNames.wrapper
 		}
@@ -130,6 +132,7 @@ export class Motion {
 		this.canvas.style.display = 'block'
 		this.canvas.style.width = '100%'
 		this.canvas.style.height = '100%'
+		this.canvas.style.pointerEvents = 'none'
 		this.element.appendChild(this.canvas)
 
 		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
@@ -154,10 +157,17 @@ export class Motion {
 
 		const loop = () => {
 			if (!this.running || !this.glr) return
+			this.rafId = requestAnimationFrame(loop)
+
 			const now = performance.now()
+			const delta = now - this.lastTime
+
+			// This kind of animation will not benefit from high frame rates
+			if (delta < 1000 / 32) return
+
+			this.lastTime = now
 			const t = (now - this.startTime) * 0.001
 			this.render(t)
-			this.rafId = requestAnimationFrame(loop)
 		}
 		this.rafId = requestAnimationFrame(loop)
 	}
