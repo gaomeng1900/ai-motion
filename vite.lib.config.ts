@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 
+import { glslLoaderPlugin } from './vite.glsl'
+
 export default defineConfig({
 	build: {
 		lib: {
@@ -16,4 +18,5 @@ export default defineConfig({
 	define: {
 		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
 	},
+	plugins: [glslLoaderPlugin()],
 })

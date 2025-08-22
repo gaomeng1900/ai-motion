@@ -1,6 +1,9 @@
 import { computeBorderGeometry } from './gl/geometry'
 import { createProgram } from './gl/program'
-import { fragmentShaderSource, vertexShaderSource } from './gl/shaders'
+import fragmentShaderSource from './gl/shaders/fragment.glsl'
+import vertexShaderSource from './gl/shaders/vertex.glsl'
+
+// import { fragmentShaderSource, vertexShaderSource } from './gl/shaders/__legacy'
 
 console.log(
 	`%c🌈 AI Motion ${(window as any).__AI_MOTION_VERSION__ || ''} 🌈`,

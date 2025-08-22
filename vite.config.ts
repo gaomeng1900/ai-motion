@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite'
 
+import { glslLoaderPlugin } from './vite.glsl'
+
 // Demo site config (blank/white page)
 export default defineConfig({
 	server: {
@@ -17,4 +19,5 @@ export default defineConfig({
 	define: {
 		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
 	},
+	plugins: [glslLoaderPlugin()],
 })
