@@ -18,10 +18,12 @@ export type MotionOptions = {
 	 */
 	ratio?: number
 	/**
-	 * Color mode. What background color to use upon.
-	 * - dark: better for dark background. light and luminous glow. May be invisible on light backgrounds.
-	 * - light: better for light background. high hue glow. May be too much on dark backgrounds.
+	 * Color mode. Upon what background color will the element be displayed.
+	 * - dark: optimize for dark background. (clean and luminous glow. may be invisible on light backgrounds.)
+	 * - light: optimize for light background. (high saturation glow. not elegant on dark backgrounds.)
 	 * @default light
+	 * @note It's not possible to make a style that works well on both light and dark backgrounds.
+	 * @note If you do not know the background color, start with light.
 	 */
 	mode?: 'dark' | 'light'
 	/**
@@ -104,6 +106,7 @@ export class Motion {
 			borderWidth: options.borderWidth ?? 10,
 			glowWidth: options.glowWidth ?? 200,
 			borderRadius: options.borderRadius ?? 16,
+			mode: options.mode ?? 'light',
 			...options,
 		}
 
@@ -346,6 +349,12 @@ export class Motion {
 		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth)
 		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius)
 		this.checkGLError(gl, 'resize: after uniform updates')
+
+		// Render a frame immediately after resize
+		const now = performance.now()
+		this.lastTime = now
+		const t = (now - this.startTime) * 0.001
+		this.render(t)
 	}
 
 	private render(t: number): void {
