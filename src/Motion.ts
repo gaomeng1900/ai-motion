@@ -3,13 +3,50 @@ import { createProgram } from './gl/createProgram'
 import { fragmentShaderSource, vertexShaderSource } from './gl/shaders'
 
 export type MotionOptions = {
-	width?: number // If omitted, uses element client size
-	height?: number // If omitted, uses element client size
-	ratio?: number // DPR multiplier; can be < 1
-	borderWidth?: number // default 8
-	glowWidth?: number // default 100
-	borderRadius?: number // default 8
+	/**
+	 * The width of the motion element.
+	 * @default 600
+	 */
+	width?: number
+	/**
+	 * The height of the motion element.
+	 * @default 600
+	 */
+	height?: number
+	/**
+	 * Device pixel ratio multiplier; can be less than 1.
+	 */
+	ratio?: number
+	/**
+	 * Color mode. What background color to use upon.
+	 * - dark: better for dark background. light and luminous glow. May be invisible on light backgrounds.
+	 * - light: better for light background. high hue glow. May be too much on dark backgrounds.
+	 * @default light
+	 */
+	mode?: 'dark' | 'light'
+	/**
+	 * The width of the border.
+	 * @default 10
+	 */
+	borderWidth?: number
+	/**
+	 * The width of the glow effect.
+	 * @default 200
+	 *
+	 */
+	glowWidth?: number
+	/**
+	 * The border radius.
+	 * @default 10
+	 */
+	borderRadius?: number
+	/**
+	 * Custom class names for wrapper and canvas elements.
+	 */
 	classNames?: { wrapper?: string; canvas?: string }
+	/**
+	 * Custom styles for wrapper and canvas elements.
+	 */
 	styles?: {
 		wrapper?: Partial<CSSStyleDeclaration>
 		canvas?: Partial<CSSStyleDeclaration>
@@ -63,9 +100,9 @@ export class Motion {
 	constructor(options: MotionOptions = {}) {
 		this.options = {
 			ratio: options.ratio ?? (typeof window !== 'undefined' ? window.devicePixelRatio : 1),
-			borderWidth: options.borderWidth ?? 8,
-			glowWidth: options.glowWidth ?? 100,
-			borderRadius: options.borderRadius ?? 8,
+			borderWidth: options.borderWidth ?? 10,
+			glowWidth: options.glowWidth ?? 200,
+			borderRadius: options.borderRadius ?? 10,
 			...options,
 		}
 
@@ -94,6 +131,8 @@ export class Motion {
 		this.canvas.style.width = '100%'
 		this.canvas.style.height = '100%'
 		this.element.appendChild(this.canvas)
+
+		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
 	}
 
 	public start(): void {
@@ -134,6 +173,7 @@ export class Motion {
 			gl.deleteProgram(program)
 			this.glr = undefined
 		}
+		this.canvas.remove()
 	}
 
 	private checkGLError(gl: WebGL2RenderingContext, context: string): void {
@@ -210,11 +250,20 @@ export class Motion {
 		const uGlowWidth = gl.getUniformLocation(program, 'uGlowWidth')
 		const uBorderRadius = gl.getUniformLocation(program, 'uBorderRadius')
 		const uColors = gl.getUniformLocation(program, 'uColors')
+		const uGlowExponent = gl.getUniformLocation(program, 'uGlowExponent')
+		const uGlowFactor = gl.getUniformLocation(program, 'uGlowFactor')
 
 		gl.useProgram(program)
 		gl.uniform1f(uBorderWidth, this.options.borderWidth)
 		gl.uniform1f(uGlowWidth, this.options.glowWidth)
 		gl.uniform1f(uBorderRadius, this.options.borderRadius)
+		if (this.options.mode === 'dark') {
+			gl.uniform1f(uGlowExponent, 2.0)
+			gl.uniform1f(uGlowFactor, 1.8)
+		} else {
+			gl.uniform1f(uGlowExponent, 1.0)
+			gl.uniform1f(uGlowFactor, 1.0)
+		}
 
 		// Set color uniforms
 		const colorVecs = COLORS.map(parseColor)

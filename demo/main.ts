@@ -10,6 +10,7 @@ const motion = new Motion({
 	styles: {
 		wrapper: { width: '100%', height: '100%' },
 	},
+	mode: 'light',
 })
 
 app.appendChild(motion.element)
@@ -28,3 +29,8 @@ window.addEventListener('resize', update)
 // Initial sizing, then start rendering
 update()
 motion.start()
+
+// setTimeout(() => {
+// 	// Clean up
+// 	motion.dispose()
+// }, 1000)
