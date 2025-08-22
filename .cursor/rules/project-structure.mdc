@@ -5,7 +5,6 @@ alwaysApply: true
 
 - Entry point is [src/Motion.ts](mdc:src/Motion.ts). Single public class `Motion` exposing:
   - `element: HTMLDivElement` wrapper (not auto-appended)
-  - `start()` to begin rendering
   - `resize(width: number, height: number, ratio?: number)` to size the canvas (ratio defaults to devicePixelRatio)
   - `dispose()` to tear down
 
@@ -18,7 +17,7 @@ alwaysApply: true
 
 - Build configs:
   - [vite.lib.config.ts](mdc:vite.lib.config.ts): ESM-only library build → `dist/motion.js`
-  - [vite.demo.config.ts](mdc:vite.demo.config.ts): demo build → `demo-dist/`
+  - [vite.config.ts](mdc:vite.config.ts): demo build → `build-demo/`
 
 - Packaging:
   - ESM-only (no UMD/IIFE). See [package.json](mdc:package.json)

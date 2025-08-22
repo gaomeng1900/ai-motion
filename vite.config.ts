@@ -2,7 +2,6 @@ import { defineConfig } from 'vite'
 
 // Demo site config (blank/white page)
 export default defineConfig({
-	root: 'demo',
 	server: {
 		open: true,
 	},
@@ -10,7 +9,7 @@ export default defineConfig({
 		open: true,
 	},
 	build: {
-		outDir: '../build-demo',
+		outDir: 'build-demo',
 		emptyOutDir: true,
 		sourcemap: true,
 	},

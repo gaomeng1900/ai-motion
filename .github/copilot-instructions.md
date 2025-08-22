@@ -22,7 +22,7 @@ Minimal WebGL2 ESM library for AI-style mask animation. Single-class API with no
 ### `src/gl/` - WebGL Pipeline
 
 - **`shaders.ts`**: Vertex/fragment source with GLSL template literals
-- **`border.ts`**: Generates border-specific geometry (8 triangles, not fullscreen quad)
+- **`geometry.ts`**: Generates border-specific geometry (8 triangles, not fullscreen quad)
 - **`createProgram.ts`**: Standard WebGL program compilation/linking
 
 ## Development Workflows
@@ -30,8 +30,8 @@ Minimal WebGL2 ESM library for AI-style mask animation. Single-class API with no
 ### Library Development
 
 ```bash
-npm run build:lib    # ESM build → build/motion.js
-npm run build        # Both lib + types
+npm run build    	# ESM build lib+types
+npm run build:demo 	# Build demo static files
 ```
 
 ### Demo/Testing
@@ -41,7 +41,7 @@ npm run dev          # Dev server using demo/ folder
 npm run build:demo   # Static demo build → build-demo/
 ```
 
-**Demo structure**: `demo/index.html` + `demo/main.ts` - blank page for testing library integration.
+**Demo structure**: `index.html`
 
 ## WebGL Implementation Patterns
 
@@ -62,7 +62,7 @@ Proper WebGL cleanup is critical - dispose method handles resource cleanup and a
 ## Build System Details
 
 - **Library config**: Builds single ESM entry point to `build/` directory
-- **Demo config**: Separate build targeting `demo/` source with live-reload development
+- **Demo config**: Separate build with html and live-reload development
 - **Dual output strategy**: Library and demo builds are completely separate
 
 ## Code Style & Conventions

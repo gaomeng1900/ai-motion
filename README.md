@@ -27,15 +27,14 @@ motion.resize(container.clientWidth, container.clientHeight);
 
 ```bash
 npm i
-npm run dev
+npm start
 ```
 
 Builds:
 
 ```bash
-npm run build:lib
+npm run build
 npm run build:demo
-npm run preview:demo
 ```
 
 MIT License.

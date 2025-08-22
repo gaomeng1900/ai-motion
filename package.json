@@ -17,8 +17,8 @@
 	"sideEffects": false,
 	"scripts": {
 		"start": "npm run dev",
-		"dev": "vite -c vite.demo.config.ts",
-		"build:demo": "vite build -c vite.demo.config.ts",
+		"dev": "vite -c vite.config.ts",
+		"build:demo": "vite build -c vite.config.ts",
 		"build:lib": "vite build -c vite.lib.config.ts",
 		"build:types": "tsc --emitDeclarationOnly",
 		"build": "npm run build:lib && npm run build:types",
