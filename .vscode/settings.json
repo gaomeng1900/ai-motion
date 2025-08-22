@@ -1,3 +1,7 @@
 {
-	"cSpell.words": ["fract", "fwidth", "glsl", "lowp", "smoothstep"]
+	"cSpell.words": ["fract", "fwidth", "glsl", "lowp", "smoothstep"],
+	"webgl-glsl-editor.format.favorFloatingSuffix": false,
+	"[glsl]": {
+		"editor.defaultFormatter": "raczzalan.webgl-glsl-editor"
+	}
 }

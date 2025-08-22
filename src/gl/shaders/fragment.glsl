@@ -15,7 +15,6 @@ uniform vec3 uColors[4];
 uniform float uGlowExponent;
 uniform float uGlowFactor;
 
-
 const float PI = 3.14159265359;
 const float TWO_PI = 2.0 * PI;
 const float HALF_PI = 0.5 * PI;
@@ -32,11 +31,11 @@ const vec4 outerRadius = vec4(PI * 1.2, PI * 0.9, PI * 0.6, PI * 0.4);
  * @return float A random float value.
  */
 float random(vec2 st) {
-    return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
+	return fract(sin(dot(st.xy, vec2(12.9898, 78.233))) * 43758.5453123);
 }
 
 vec2 random2(vec2 st) {
-    return vec2(random(st), random(st + 1.0));
+	return vec2(random(st), random(st + 1.0));
 }
 
 /**
@@ -45,8 +44,8 @@ vec2 random2(vec2 st) {
 float aaStep(float edge, float d) {
     // Calculate the width of the anti-aliasing transition
     // This is the distance the value changes over one pixel.
-    float width = fwidth(d);
-    return smoothstep(edge - width * 0.5, edge + width * 0.5, d);
+	float width = fwidth(d);
+	return smoothstep(edge - width * 0.5, edge + width * 0.5, d);
 }
 
 /**
@@ -55,14 +54,14 @@ float aaStep(float edge, float d) {
  * @return float The anti-aliased fractional part of x.
  */
 float aaFract(float x) {
-    float f = fract(x);
-    float w = fwidth(x); // Get the width of the transition band for one pixel.
+	float f = fract(x);
+	float w = fwidth(x); // Get the width of the transition band for one pixel.
 
     // Use smoothstep to fade the line out as it approaches the 1.0 boundary.
     // The fade happens over a distance equal to the pixel width 'w'.
-    float smooth_f = f * (1.0 - smoothstep(1.0 - w, 1.0, f));
+	float smooth_f = f * (1.0 - smoothstep(1.0 - w, 1.0, f));
 
-    return smooth_f;
+	return smooth_f;
 }
 
 /**
@@ -123,9 +122,9 @@ float getVignette(vec2 uv) {
  * Convert UV coordinates to angle (0 to 2π) around the border
  */
 float uvToAngle(vec2 uv) {
-    vec2 center = vec2(0.5);
-    vec2 dir = uv - center;
-    return atan(dir.y, dir.x) + PI;
+	vec2 center = vec2(0.5);
+	vec2 dir = uv - center;
+	return atan(dir.y, dir.x) + PI;
 }
 
 /**
@@ -179,7 +178,7 @@ void main() {
 
 	// mix these 4 colors with distance
 	vec3 borderColor = vec3(0.0);
-	for (int i = 0; i < 4; i++) {
+	for(int i = 0; i < 4; i++) {
 		borderColor = mix(borderColor, uColors[i], intensityBorder[i]);
 	}
 	borderColor *= 1.1;
