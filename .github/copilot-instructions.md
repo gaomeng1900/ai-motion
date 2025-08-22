@@ -23,7 +23,7 @@ Minimal WebGL2 ESM library for AI-style mask animation. Single-class API with no
 
 - **`shaders.ts`**: Vertex/fragment source with GLSL template literals
 - **`geometry.ts`**: Generates border-specific geometry (8 triangles, not fullscreen quad)
-- **`createProgram.ts`**: Standard WebGL program compilation/linking
+- **`program.ts`**: Standard WebGL program compilation/linking
 
 ## Development Workflows
 
