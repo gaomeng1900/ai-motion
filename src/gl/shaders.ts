@@ -1,11 +1,12 @@
 /**
- * simplify shader code. remove unnecessary whitespace and all comments
+ * simplify shader code. remove unnecessary whitespace and all comments.
+ * @note optimize for shader compile time (runtime driver)
  */
 function simplify(shaderCode: string): string {
 	return shaderCode
 		.replace(/\/\*[\s\S]*?\*\//g, '') // remove block comments
 		.replace(/\/\/.*$/gm, '') // remove line comments
-		.replace(/\n+/g, '\n') // merge consecutive lines
+		.replace(/(\n\s*\n)+/g, '\n') // merge consecutive empty lines
 		.trim()
 }
 
@@ -46,9 +47,11 @@ uniform float uGlowFactor;
 
 
 const float PI = 3.14159265359;
+const float TWO_PI = 2.0 * PI;
+const float HALF_PI = 0.5 * PI;
 
 // Light source parameters (constants)
-const vec4 startPositions = vec4(0.0, PI, PI * 0.5, PI * 1.5);
+const vec4 startPositions = vec4(0.0, PI, HALF_PI, 1.5 * PI);
 const vec4 speeds = vec4(-1.5, -1.5, -0.9, 2.0);
 const vec4 innerRadius = vec4(PI * 0.8, PI * 0.7, PI * 0.3, PI * 0.1);
 const vec4 outerRadius = vec4(PI * 1.2, PI * 0.9, PI * 0.6, PI * 0.4);
@@ -100,8 +103,7 @@ float aaFract(float x) {
  * @param {float} r - The corner radius.
  * @returns {float} - Signed distance to the surface of the rounded rectangle.
  */
-float sdRoundedBox( in vec2 p, in vec2 b, in float r )
-{
+float sdRoundedBox(in vec2 p, in vec2 b, in float r) {
 	vec2 q = abs(p) - b + r;
 	return min(max(q.x, q.y), 0.0) + length(max(q, 0.0)) - r;
 }
@@ -159,9 +161,9 @@ float uvToAngle(vec2 uv) {
 /**
  * Get current light center position (angle) based on start position, speed and time
  */
-float getLightCenter(float startPos, float speed, float time) {
-    return mod(startPos + speed * time, 2.0 * PI);
-}
+// float getLightCenter(float startPos, float speed, float time) {
+//     return mod(startPos + speed * time, TWO_PI);
+// }
 
 void main() {
 	vec2 uv = vUV;
@@ -184,18 +186,18 @@ void main() {
 
 	float posAngle = uvToAngle(uv);
 
-	vec4 lightCenter = vec4(
-		getLightCenter(startPositions.x, speeds.x, uTime),
-		getLightCenter(startPositions.y, speeds.y, uTime),
-		getLightCenter(startPositions.z, speeds.z, uTime),
-		getLightCenter(startPositions.w, speeds.w, uTime)
-	);
+	// vec4 lightCenter = vec4(
+	// 	getLightCenter(startPositions.x, speeds.x, uTime),
+	// 	getLightCenter(startPositions.y, speeds.y, uTime),
+	// 	getLightCenter(startPositions.z, speeds.z, uTime),
+	// 	getLightCenter(startPositions.w, speeds.w, uTime)
+	// );
+	vec4 lightCenter = mod(startPositions + speeds * uTime, TWO_PI);
 
 	vec4 angleDist = abs(posAngle - lightCenter);
 
 	// Calculate shortest angular distance (considering wrap-around)
-	vec4 disToLight = min(angleDist, 2.0 * PI - angleDist) / (2.0 * PI);
-
+	vec4 disToLight = min(angleDist, TWO_PI - angleDist) / TWO_PI;
 
 	// 🌈 lit the border
 
@@ -229,7 +231,7 @@ void main() {
 	glowColor += uColors[0] * intensityGlow[0] * breath.x;
 	glowColor += uColors[1] * intensityGlow[1] * breath.y;
 	glowColor += uColors[2] * intensityGlow[2] * breath.z;
-	glowColor += uColors[3] * intensityGlow[3] * breath.w * glow;
+	glowColor += uColors[3] * intensityGlow[3] * breath.w * glow; // fade it a little bit
 
 	// 💿 mix
 

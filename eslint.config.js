@@ -1,8 +1,9 @@
 import js from '@eslint/js'
 import prettier from 'eslint-config-prettier'
 import prettierPlugin from 'eslint-plugin-prettier'
+import { defineConfig, globalIgnores } from 'eslint/config'
 
-export default [
+export default defineConfig([
 	js.configs.recommended,
 	prettier,
 	{
@@ -17,4 +18,5 @@ export default [
 			'prettier/prettier': 'error',
 		},
 	},
-]
+	globalIgnores(['build/*', 'build-demo/*']),
+])

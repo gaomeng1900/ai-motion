@@ -1,5 +1,5 @@
-import { createProgram } from './gl/createProgram'
 import { computeBorderGeometry } from './gl/geometry'
+import { createProgram } from './gl/program'
 import { fragmentShaderSource, vertexShaderSource } from './gl/shaders'
 
 console.log(

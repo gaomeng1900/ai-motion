@@ -8,10 +8,10 @@ export default defineConfig({
 			formats: ['es'],
 			fileName: () => 'motion.js',
 		},
-		sourcemap: true,
+		sourcemap: false,
 		outDir: 'build',
 		emptyOutDir: true,
-		target: 'es2019',
+		minify: false,
 	},
 	define: {
 		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
