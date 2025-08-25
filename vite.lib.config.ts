@@ -15,6 +15,7 @@ export default defineConfig({
 		emptyOutDir: true,
 		minify: false,
 	},
+	publicDir: false,
 	define: {
 		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
 	},
