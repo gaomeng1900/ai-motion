@@ -19,6 +19,21 @@ container.appendChild(motion.element);
 // Set size explicitly (width, height in CSS pixels; ratio defaults to devicePixelRatio)
 motion.resize(container.clientWidth, container.clientHeight);
 
+// start the animation
+motion.start()
+
+// pause the rendering
+// motion.pause()
+
+// autoResize to another element
+// motion.autoResize(document.body)
+
+// fade in animation
+// motion.fadeIn()
+
+// fade out animation
+// motion.fadeOut()
+
 // Later, dispose
 // motion.dispose();
 ```

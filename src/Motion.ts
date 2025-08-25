@@ -95,7 +95,7 @@ function parseColor(colorStr: string): [number, number, number] {
 }
 
 export class Motion {
-	public readonly element: HTMLDivElement
+	readonly element: HTMLDivElement
 
 	private canvas: HTMLCanvasElement
 	private options: Required<
@@ -103,10 +103,12 @@ export class Motion {
 	> &
 		Omit<MotionOptions, 'ratio' | 'borderWidth' | 'glowWidth' | 'borderRadius'>
 	private running = false
+	private disposed = false
 	private startTime = 0
 	private lastTime = 0
 	private rafId: number | null = null
 	private glr?: GLResources
+	private observer?: ResizeObserver
 
 	constructor(options: MotionOptions = {}) {
 		this.options = {
@@ -124,6 +126,7 @@ export class Motion {
 		}
 
 		this.element = document.createElement('div')
+		this.element.style.overflow = 'hidden'
 		this.element.style.pointerEvents = 'none'
 		if (this.options.classNames?.wrapper) {
 			this.element.className = this.options.classNames.wrapper
@@ -141,31 +144,30 @@ export class Motion {
 		}
 		// Default sizing behavior: the wrapper defines layout; canvas is 100% size of wrapper
 		this.canvas.style.display = 'block'
-		this.canvas.style.width = '100%'
-		this.canvas.style.height = '100%'
+		this.canvas.style.transformOrigin = 'center'
 		this.canvas.style.pointerEvents = 'none'
 		this.element.appendChild(this.canvas)
 
-		this.start()
+		this.setupGL()
 		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
 	}
 
-	private start(): void {
+	start(): void {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
 		if (this.running) return
-		const gl = this.canvas.getContext('webgl2', { antialias: false, alpha: true })
-		if (!gl) {
-			throw new Error('WebGL2 is required but not available.')
+		if (!this.glr) {
+			console.error('WebGL resources are not initialized.')
+			return
 		}
 
-		this.glr = this.setupGL(gl)
 		this.running = true
 		this.startTime = performance.now()
 
 		// Initialize viewport and resolution to current canvas size.
-		gl.viewport(0, 0, this.canvas.width, this.canvas.height)
-		gl.useProgram(this.glr.program)
-		gl.uniform2f(this.glr.uResolution, this.canvas.width, this.canvas.height)
-		this.checkGLError(gl, 'start: after initial setup')
+		this.glr.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
+		this.glr.gl.useProgram(this.glr.program)
+		this.glr.gl.uniform2f(this.glr.uResolution, this.canvas.width, this.canvas.height)
+		this.checkGLError(this.glr.gl, 'start: after initial setup')
 
 		const loop = () => {
 			if (!this.running || !this.glr) return
@@ -184,7 +186,15 @@ export class Motion {
 		this.rafId = requestAnimationFrame(loop)
 	}
 
-	public dispose(): void {
+	pause() {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
+		this.running = false
+		if (this.rafId !== null) cancelAnimationFrame(this.rafId)
+	}
+
+	dispose(): void {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
+		this.disposed = true
 		this.running = false
 		if (this.rafId !== null) cancelAnimationFrame(this.rafId)
 		if (this.glr) {
@@ -196,6 +206,119 @@ export class Motion {
 			this.glr = undefined
 		}
 		this.canvas.remove()
+	}
+
+	resize(width: number, height: number, ratio?: number): void {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
+		if (!this.glr) {
+			console.warn('WebGL context not initialized. Resize will be ignored.')
+			return
+		}
+		const { gl, program, vao, positionBuffer, uvBuffer, uResolution } = this.glr
+
+		const dpr = ratio ?? this.options.ratio ?? window.devicePixelRatio ?? 1
+		const desiredWidth = Math.max(1, Math.floor(width * dpr))
+		const desiredHeight = Math.max(1, Math.floor(height * dpr))
+
+		this.canvas.style.width = `${width}px`
+		this.canvas.style.height = `${height}px`
+		if (this.canvas.width !== desiredWidth || this.canvas.height !== desiredHeight) {
+			this.canvas.width = desiredWidth
+			this.canvas.height = desiredHeight
+		}
+
+		gl.viewport(0, 0, this.canvas.width, this.canvas.height)
+		this.checkGLError(gl, 'resize: after viewport setup')
+
+		// Rebuild geometry for current size
+		const { positions, uvs } = computeBorderGeometry(
+			this.canvas.width,
+			this.canvas.height,
+			this.options.borderWidth * dpr,
+			this.options.glowWidth * dpr
+		)
+
+		gl.bindVertexArray(vao)
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
+		gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
+		const aPosition = gl.getAttribLocation(program, 'aPosition')
+		gl.enableVertexAttribArray(aPosition)
+		gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'resize: after position buffer update')
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer)
+		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW)
+		const aUV = gl.getAttribLocation(program, 'aUV')
+		gl.enableVertexAttribArray(aUV)
+		gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0)
+		this.checkGLError(gl, 'resize: after UV buffer update')
+
+		gl.useProgram(program)
+		gl.uniform2f(uResolution, this.canvas.width, this.canvas.height)
+		gl.uniform1f(this.glr.uBorderWidth, this.options.borderWidth * dpr)
+		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth * dpr)
+		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius * dpr)
+		this.checkGLError(gl, 'resize: after uniform updates')
+
+		// Render a frame immediately after resize
+		const now = performance.now()
+		this.lastTime = now
+		const t = (now - this.startTime) * 0.001
+		this.render(t)
+	}
+
+	/**
+	 * Automatically resizes the canvas to match the dimensions of the given element.
+	 * @note using ResizeObserver
+	 */
+	autoResize(sourceElement: HTMLElement): void {
+		if (this.observer) {
+			this.observer.disconnect()
+		}
+
+		this.observer = new ResizeObserver(() => {
+			const rect = sourceElement.getBoundingClientRect()
+			this.resize(rect.width, rect.height)
+		})
+
+		this.observer.observe(sourceElement)
+	}
+
+	fadeIn(): Promise<void> {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
+
+		return new Promise<void>((resolve, reject) => {
+			const animation = this.canvas.animate(
+				[
+					{ opacity: 0, transform: 'scale(1.2)' },
+					{ opacity: 1, transform: 'scale(1)' },
+				],
+				{ duration: 300, easing: 'ease-out', fill: 'forwards' }
+			)
+
+			console.log(animation.onfinish)
+
+			animation.onfinish = () => resolve()
+			animation.oncancel = () => reject('canceled')
+		})
+	}
+
+	fadeOut(): Promise<void> {
+		if (this.disposed) throw new Error('Motion instance has been disposed.')
+
+		return new Promise<void>((resolve, reject) => {
+			const animation = this.canvas.animate(
+				[
+					{ opacity: 1, transform: 'scale(1)' },
+					{ opacity: 0, transform: 'scale(1.2)' },
+				],
+				{ duration: 300, easing: 'ease-in', fill: 'forwards' }
+			)
+
+			animation.onfinish = () => resolve()
+			animation.oncancel = () => reject('canceled')
+		})
 	}
 
 	private checkGLError(gl: WebGL2RenderingContext, context: string): void {
@@ -230,7 +353,12 @@ export class Motion {
 		}
 	}
 
-	private setupGL(gl: WebGL2RenderingContext): GLResources {
+	private setupGL() {
+		const gl = this.canvas.getContext('webgl2', { antialias: false, alpha: true })
+		if (!gl) {
+			throw new Error('WebGL2 is required but not available.')
+		}
+
 		const program = createProgram(gl, vertexShaderSource, fragmentShaderSource)
 		this.checkGLError(gl, 'setupGL: after createProgram')
 
@@ -297,7 +425,7 @@ export class Motion {
 		gl.bindVertexArray(null)
 		gl.bindBuffer(gl.ARRAY_BUFFER, null)
 
-		return {
+		this.glr = {
 			gl,
 			program,
 			vao,
@@ -310,65 +438,6 @@ export class Motion {
 			uBorderRadius,
 			uColors,
 		}
-	}
-
-	public resize(width: number, height: number, ratio?: number): void {
-		if (!this.glr) {
-			console.warn('WebGL context not initialized. Resize will be ignored.')
-			return
-		}
-		const { gl, program, vao, positionBuffer, uvBuffer, uResolution } = this.glr
-
-		const dpr = ratio ?? this.options.ratio ?? window.devicePixelRatio ?? 1
-		const desiredWidth = Math.max(1, Math.floor(width * dpr))
-		const desiredHeight = Math.max(1, Math.floor(height * dpr))
-
-		this.canvas.style.width = `${width}px`
-		this.canvas.style.height = `${height}px`
-		if (this.canvas.width !== desiredWidth || this.canvas.height !== desiredHeight) {
-			this.canvas.width = desiredWidth
-			this.canvas.height = desiredHeight
-		}
-
-		gl.viewport(0, 0, this.canvas.width, this.canvas.height)
-		this.checkGLError(gl, 'resize: after viewport setup')
-
-		// Rebuild geometry for current size
-		const { positions, uvs } = computeBorderGeometry(
-			this.canvas.width,
-			this.canvas.height,
-			this.options.borderWidth * dpr,
-			this.options.glowWidth * dpr
-		)
-
-		gl.bindVertexArray(vao)
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer)
-		gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW)
-		const aPosition = gl.getAttribLocation(program, 'aPosition')
-		gl.enableVertexAttribArray(aPosition)
-		gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
-		this.checkGLError(gl, 'resize: after position buffer update')
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, uvBuffer)
-		gl.bufferData(gl.ARRAY_BUFFER, uvs, gl.STATIC_DRAW)
-		const aUV = gl.getAttribLocation(program, 'aUV')
-		gl.enableVertexAttribArray(aUV)
-		gl.vertexAttribPointer(aUV, 2, gl.FLOAT, false, 0, 0)
-		this.checkGLError(gl, 'resize: after UV buffer update')
-
-		gl.useProgram(program)
-		gl.uniform2f(uResolution, this.canvas.width, this.canvas.height)
-		gl.uniform1f(this.glr.uBorderWidth, this.options.borderWidth * dpr)
-		gl.uniform1f(this.glr.uGlowWidth, this.options.glowWidth * dpr)
-		gl.uniform1f(this.glr.uBorderRadius, this.options.borderRadius * dpr)
-		this.checkGLError(gl, 'resize: after uniform updates')
-
-		// Render a frame immediately after resize
-		const now = performance.now()
-		this.lastTime = now
-		const t = (now - this.startTime) * 0.001
-		this.render(t)
 	}
 
 	private render(t: number): void {
