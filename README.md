@@ -1,23 +1,29 @@
 # ai-motion
 
-Minimal WebGL2 ESM library for an AI-style mask animation. No dependencies. Pure JS for modern browsers.
+Minimal WebGL2 ESM library for an AI-style border+glow animation. No dependencies. Pure JS for modern browsers.
 
-## Library
+![Demo](/public/demo.gif)
 
-- Entry: `src/Motion.ts`
-- WebGL2 only (no WebGL1/canvas fallback)
+## Usage
+
+`npm i -S ai-motion`
 
 ### API
 
 ```ts
 import { Motion } from 'ai-motion';
 
-const motion = new Motion();
+const motion = new Motion({
+    width: document.documentElement.clientWidth,
+    height: document.documentElement.clientHeight,
+    styles: {
+        position: 'fixed',
+        inset: '0',
+    }
+});
 
 // Mount where you like
-container.appendChild(motion.element);
-// Set size explicitly (width, height in CSS pixels; ratio defaults to devicePixelRatio)
-motion.resize(container.clientWidth, container.clientHeight);
+document.body.appendChild(motion.element);
 
 // start the animation
 motion.start()
@@ -26,7 +32,7 @@ motion.start()
 // motion.pause()
 
 // autoResize to another element
-// motion.autoResize(document.body)
+// motion.autoResize(container)
 
 // fade in animation
 // motion.fadeIn()

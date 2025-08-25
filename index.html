@@ -5,10 +5,10 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>ai-motion demo</title>
 		<style>
-			/* body {
-				color: white;
-				background: rgb(27, 27, 27);
-			} */
+			body {
+				/* color: white;
+				background: rgb(27, 27, 27); */
+			}
 		</style>
 	</head>
 	<body>
@@ -20,30 +20,20 @@
 			const motion = new Motion({
 				// ratio: 0.5,
 				// mode: 'dark',
+				width: document.documentElement.clientWidth,
+				height: document.documentElement.clientHeight,
 				styles: {
-					wrapper: {
-						position: 'fixed',
-						inset: '0',
-					},
+					position: 'fixed',
+					inset: '0',
 				},
 			})
 
 			document.body.appendChild(motion.element)
 
-			const update = () => {
-				// console.log('resize', window.innerWidth, window.innerHeight)
-				motion.resize(window.innerWidth, window.innerHeight)
-			}
-
-			// Observe size changes of the container
-			// const ro = new ResizeObserver(() => update())
-			// ro.observe(document.body)
-
 			// Also update on window resizes (covers DPR changes in many browsers)
-			window.addEventListener('resize', update)
-
-			// Initial sizing, then start rendering
-			update()
+			window.addEventListener('resize', () =>
+				motion.resize(document.documentElement.clientWidth, document.documentElement.clientHeight)
+			)
 
 			motion.start()
 			motion.fadeIn()

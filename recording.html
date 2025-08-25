@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>ai-motion demo</title>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			body {
+				color: white;
+				background: rgb(27, 27, 27);
+			}
+
+			.outer {
+				display: flex;
+			}
+
+			.wrapper {
+				width: 512px;
+				height: 400px;
+				position: relative;
+				overflow: hidden;
+			}
+
+			.inner {
+				width: 1024px;
+				height: 400px;
+				position: relative;
+				overflow: hidden;
+
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+
+			.heading {
+				font-size: 120px;
+				line-height: 1;
+				font-weight: bold;
+				text-align: center;
+				text-transform: uppercase;
+				letter-spacing: 8px;
+				color: white;
+			}
+
+			#light {
+				background: #ededed;
+
+				& .heading {
+					color: #333;
+				}
+			}
+
+			#dark {
+				background: #262626;
+
+				.inner {
+					margin-left: -512px;
+				}
+
+				& .heading {
+					color: #eee;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<div class="outer">
+			<div id="light" class="wrapper">
+				<div class="inner">
+					<div class="heading">AI-Motion</div>
+				</div>
+			</div>
+			<div id="dark" class="wrapper">
+				<div class="inner">
+					<div class="heading">AI-Motion</div>
+				</div>
+			</div>
+		</div>
+
+		<script type="module">
+			import { Motion } from './src/Motion'
+
+			// dark side
+
+			const motion = new Motion({
+				ratio: 2,
+				mode: 'dark',
+				borderWidth: 16,
+				borderRadius: 30,
+				// glowWidth: 100,
+				width: 1024,
+				height: 400,
+
+				styles: {
+					position: 'absolute',
+					inset: 0,
+				},
+			})
+
+			document.getElementById('dark').getElementsByClassName('inner')[0].appendChild(motion.element)
+
+			motion.start()
+
+			window.motion = motion
+
+			// light mode
+			const lightMotion = new Motion({
+				ratio: 2,
+				mode: 'light',
+				borderWidth: 16,
+				borderRadius: 30,
+				// glowWidth: 100,
+				width: 1024,
+				height: 400,
+
+				styles: {
+					position: 'absolute',
+					inset: 0,
+				},
+			})
+
+			document
+				.getElementById('light')
+				.getElementsByClassName('inner')[0]
+				.appendChild(lightMotion.element)
+
+			lightMotion.start()
+
+			window.lightMotion = lightMotion
+		</script>
+	</body>
+</html>

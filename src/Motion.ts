@@ -53,14 +53,11 @@ export type MotionOptions = {
 	/**
 	 * Custom class names for wrapper and canvas elements.
 	 */
-	classNames?: { wrapper?: string; canvas?: string }
+	classNames?: string
 	/**
 	 * Custom styles for wrapper and canvas elements.
 	 */
-	styles?: {
-		wrapper?: Partial<CSSStyleDeclaration>
-		canvas?: Partial<CSSStyleDeclaration>
-	}
+	styles?: Partial<CSSStyleDeclaration>
 }
 
 type GLResources = {
@@ -95,7 +92,7 @@ function parseColor(colorStr: string): [number, number, number] {
 }
 
 export class Motion {
-	readonly element: HTMLDivElement
+	readonly element: HTMLElement
 
 	private canvas: HTMLCanvasElement
 	private options: Required<
@@ -107,11 +104,13 @@ export class Motion {
 	private startTime = 0
 	private lastTime = 0
 	private rafId: number | null = null
-	private glr?: GLResources
+	private glr!: GLResources
 	private observer?: ResizeObserver
 
 	constructor(options: MotionOptions = {}) {
 		this.options = {
+			width: options.width ?? 600,
+			height: options.height ?? 600,
 			ratio: options.ratio ?? window.devicePixelRatio ?? 1,
 			borderWidth: options.borderWidth ?? 8,
 			glowWidth: options.glowWidth ?? 200,
@@ -120,36 +119,20 @@ export class Motion {
 			...options,
 		}
 
-		// Cap borderWidth to max 20
-		if (this.options.borderWidth > 20) {
-			this.options.borderWidth = 20
-		}
-
-		this.element = document.createElement('div')
-		this.element.style.overflow = 'hidden'
-		this.element.style.pointerEvents = 'none'
-		if (this.options.classNames?.wrapper) {
-			this.element.className = this.options.classNames.wrapper
-		}
-		if (this.options.styles?.wrapper) {
-			Object.assign(this.element.style, this.options.styles.wrapper)
-		}
-
 		this.canvas = document.createElement('canvas')
-		if (this.options.classNames?.canvas) {
-			this.canvas.className = this.options.classNames.canvas
+		if (this.options.classNames) {
+			this.canvas.className = this.options.classNames
 		}
-		if (this.options.styles?.canvas) {
-			Object.assign(this.canvas.style, this.options.styles.canvas)
+		if (this.options.styles) {
+			Object.assign(this.canvas.style, this.options.styles)
 		}
 		// Default sizing behavior: the wrapper defines layout; canvas is 100% size of wrapper
 		this.canvas.style.display = 'block'
 		this.canvas.style.transformOrigin = 'center'
 		this.canvas.style.pointerEvents = 'none'
-		this.element.appendChild(this.canvas)
+		this.element = this.canvas
 
 		this.setupGL()
-		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
 	}
 
 	start(): void {
@@ -162,6 +145,8 @@ export class Motion {
 
 		this.running = true
 		this.startTime = performance.now()
+
+		this.resize(this.options.width ?? 600, this.options.height ?? 600, this.options.ratio)
 
 		// Initialize viewport and resolution to current canvas size.
 		this.glr.gl.viewport(0, 0, this.canvas.width, this.canvas.height)
@@ -197,23 +182,27 @@ export class Motion {
 		this.disposed = true
 		this.running = false
 		if (this.rafId !== null) cancelAnimationFrame(this.rafId)
-		if (this.glr) {
-			const { gl, vao, positionBuffer, uvBuffer, program } = this.glr
-			if (vao) gl.deleteVertexArray(vao)
-			if (positionBuffer) gl.deleteBuffer(positionBuffer)
-			if (uvBuffer) gl.deleteBuffer(uvBuffer)
-			gl.deleteProgram(program)
-			this.glr = undefined
-		}
+
+		const { gl, vao, positionBuffer, uvBuffer, program } = this.glr
+		if (vao) gl.deleteVertexArray(vao)
+		if (positionBuffer) gl.deleteBuffer(positionBuffer)
+		if (uvBuffer) gl.deleteBuffer(uvBuffer)
+		gl.deleteProgram(program)
+
+		if (this.observer) this.observer.disconnect()
+
 		this.canvas.remove()
 	}
 
 	resize(width: number, height: number, ratio?: number): void {
 		if (this.disposed) throw new Error('Motion instance has been disposed.')
-		if (!this.glr) {
-			console.warn('WebGL context not initialized. Resize will be ignored.')
-			return
-		}
+
+		this.options.width = width
+		this.options.height = height
+		if (ratio) this.options.ratio = ratio
+
+		if (!this.running) return
+
 		const { gl, program, vao, positionBuffer, uvBuffer, uResolution } = this.glr
 
 		const dpr = ratio ?? this.options.ratio ?? window.devicePixelRatio ?? 1
@@ -296,8 +285,6 @@ export class Motion {
 				],
 				{ duration: 300, easing: 'ease-out', fill: 'forwards' }
 			)
-
-			console.log(animation.onfinish)
 
 			animation.onfinish = () => resolve()
 			animation.oncancel = () => reject('canceled')
