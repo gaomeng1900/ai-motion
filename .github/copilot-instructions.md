@@ -54,6 +54,7 @@ Uses border-optimized geometry generating triangles around canvas perimeter, not
 - Fragment shader handles animation logic using time-based uniforms
 - UV coordinates span full canvas area (0..1)
 - Current implementation shows test patterns; animation logic goes in fragment shader
+- Use dedicated glsl files. Always start with `#version 300 es`
 
 ### Resource Management
 
@@ -71,5 +72,3 @@ Proper WebGL cleanup is critical - dispose method handles resource cleanup and a
 - Error handling with descriptive context messages for WebGL operations
 - Geometry computations in pixel space, converted to clip coordinates
 - Constructor handles options with sensible defaults and validation
-
-When modifying shaders, use the demo development server and monitor browser console for WebGL errors.

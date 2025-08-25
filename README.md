@@ -30,11 +30,13 @@ npm i
 npm start
 ```
 
-Builds:
+## Build
 
 ```bash
 npm run build
 npm run build:demo
 ```
+
+## License
 
 MIT License.
