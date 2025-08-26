@@ -1,9 +1,9 @@
+import type { Plugin } from 'vite'
+
 /**
  * Vite plugin to load GLSL files as string modules.
  * Supports .glsl file extensions.
  */
-import type { Plugin } from 'vite'
-
 export function glslLoaderPlugin(): Plugin {
 	const extensions = ['.glsl']
 
@@ -37,4 +37,42 @@ export function glslLoaderPlugin(): Plugin {
 			}
 		},
 	}
+}
+
+/**
+ * Vite plugin to replace constant values in code
+ */
+export function replacePlugin(replacements: Record<string, string>): Plugin {
+	return {
+		name: 'replace-constants',
+
+		transform(src: string, id: string) {
+			// Skip node_modules and non-JS/TS files
+			if (id.includes('node_modules') || !/\.(js|ts|jsx|tsx)$/.test(id)) {
+				return null
+			}
+
+			let code = src
+			let hasReplacements = false
+
+			// Apply all replacements
+			for (const [key, value] of Object.entries(replacements)) {
+				const regex = new RegExp(escapeRegExp(key), 'g')
+				if (regex.test(code)) {
+					code = code.replace(regex, value)
+					hasReplacements = true
+				}
+			}
+
+			// Only return transformed code if we made changes
+			return hasReplacements ? { code, map: null } : null
+		},
+	}
+}
+
+/**
+ * Escape special regex characters in a string
+ */
+function escapeRegExp(string: string): string {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }

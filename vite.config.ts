@@ -1,23 +1,21 @@
 import { defineConfig } from 'vite'
 
-import { glslLoaderPlugin } from './vite.glsl'
+import { glslLoaderPlugin, replacePlugin } from './vite.plugins'
 
-// Demo site config (blank/white page)
 export default defineConfig({
+	build: {
+		outDir: 'build-demo',
+		sourcemap: true,
+		emptyOutDir: true,
+	},
 	server: {
 		open: true,
 	},
-	preview: {
-		open: true,
-	},
-	build: {
-		outDir: 'build-demo',
-		emptyOutDir: true,
-		sourcemap: true,
-	},
 	publicDir: false,
-	define: {
-		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
-	},
-	plugins: [glslLoaderPlugin()],
+	plugins: [
+		glslLoaderPlugin(),
+		replacePlugin({
+			__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
+		}),
+	],
 })

@@ -1,9 +1,10 @@
 import { defineConfig } from 'vite'
 
-import { glslLoaderPlugin } from './vite.glsl'
+import { glslLoaderPlugin, replacePlugin } from './vite.plugins'
 
 export default defineConfig({
 	build: {
+		outDir: 'build',
 		lib: {
 			entry: 'src/Motion.ts',
 			name: 'Motion',
@@ -11,13 +12,14 @@ export default defineConfig({
 			fileName: () => 'motion.js',
 		},
 		sourcemap: false,
-		outDir: 'build',
-		emptyOutDir: true,
 		minify: false,
+		emptyOutDir: true,
 	},
 	publicDir: false,
-	define: {
-		__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
-	},
-	plugins: [glslLoaderPlugin()],
+	plugins: [
+		glslLoaderPlugin(),
+		replacePlugin({
+			__AI_MOTION_VERSION__: JSON.stringify(process.env.npm_package_version),
+		}),
+	],
 })

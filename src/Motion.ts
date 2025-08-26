@@ -6,8 +6,8 @@ import vertexShaderSource from './gl/shaders/vertex.glsl'
 // import { fragmentShaderSource, vertexShaderSource } from './gl/shaders/__legacy'
 
 console.log(
-	`%c🌈 AI Motion ${(window as any).__AI_MOTION_VERSION__ || ''} 🌈`,
-	'background: linear-gradient(90deg, #39b6ff, #bd45fb, #ff5733, #ffd600); color: white; text-shadow: 0 0 5px rgba(0, 0, 0, 0.5); font-weight: bold; font-size: 1em; padding: 2px 12px; border-radius: 6px;'
+	`%c🌈 ai-motion ${__AI_MOTION_VERSION__} 🌈`,
+	'background: linear-gradient(90deg, #39b6ff, #bd45fb, #ff5733, #ffd600); color: white; text-shadow: 0 0 2px rgba(0, 0, 0, 0.2); font-weight: bold; font-size: 1em; padding: 2px 12px; border-radius: 6px;'
 )
 
 export type MotionOptions = {
