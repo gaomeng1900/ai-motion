@@ -178,7 +178,7 @@ export class Motion {
 	}
 
 	dispose(): void {
-		if (this.disposed) throw new Error('Motion instance has been disposed.')
+		if (this.disposed) return
 		this.disposed = true
 		this.running = false
 		if (this.rafId !== null) cancelAnimationFrame(this.rafId)
