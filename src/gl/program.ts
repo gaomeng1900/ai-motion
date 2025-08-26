@@ -1,3 +1,11 @@
+/**
+ * AI Motion - WebGL2 animated border with AI-style glow effects
+ *
+ * @author Simon<gaomeng1900@gmail.com>
+ * @license MIT
+ * @repository https://github.com/gaomeng1900/ai-motion
+ */
+
 export function compileShader(
 	gl: WebGL2RenderingContext,
 	type: GLenum,

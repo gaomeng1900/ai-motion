@@ -1,10 +1,16 @@
 {
 	"name": "ai-motion",
-	"version": "0.4.5",
+	"version": "0.4.6",
 	"private": false,
 	"license": "MIT",
 	"type": "module",
 	"description": "A minimal WebGL2 ESM library for AI-style motion mask animation.",
+	"keywords": [
+		"webgl",
+		"animation",
+		"ai",
+		"visual effects"
+	],
 	"main": "build/motion.js",
 	"module": "build/motion.js",
 	"types": "build/Motion.d.ts",

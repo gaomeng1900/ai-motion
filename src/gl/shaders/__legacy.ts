@@ -1,4 +1,12 @@
 /**
+ * AI Motion - WebGL2 animated border with AI-style glow effects
+ *
+ * @author Simon<gaomeng1900@gmail.com>
+ * @license MIT
+ * @repository https://github.com/gaomeng1900/ai-motion
+ */
+
+/**
  * simplify shader code. remove unnecessary whitespace and all comments.
  * @note optimize for shader compile time (runtime driver)
  */

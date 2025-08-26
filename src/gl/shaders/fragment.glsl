@@ -1,3 +1,11 @@
+/**
+ * AI Motion
+ *
+ * @author Simon<gaomeng1900@gmail.com>
+ * @license MIT
+ * @repository https://github.com/gaomeng1900/ai-motion
+ */
+
 #version 300 es
 precision lowp float;
 
@@ -21,7 +29,7 @@ const float HALF_PI = 0.5 * PI;
 
 // Light source parameters (constants)
 const vec4 startPositions = vec4(0.0, PI, HALF_PI, 1.5 * PI);
-const vec4 speeds = vec4(-1.5, -1.5, -0.9, 2.0);
+const vec4 speeds = vec4(-1.9, -1.9, -1.5, 2.1);
 const vec4 innerRadius = vec4(PI * 0.8, PI * 0.7, PI * 0.3, PI * 0.1);
 const vec4 outerRadius = vec4(PI * 1.2, PI * 0.9, PI * 0.6, PI * 0.4);
 
