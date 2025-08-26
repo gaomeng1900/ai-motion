@@ -5,6 +5,8 @@
 [![npm downloads](https://img.shields.io/npm/dm/ai-motion.svg)](https://www.npmjs.com/package/ai-motion)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
+**English | [中文](README.zh-CN.md)**
+
 WebGL2 animated border with AI-style glow effects. Zero dependencies, modern browsers only.
 
 🌈 **[Live Demo](https://gaomeng1900.github.io/ai-motion/)**
@@ -187,4 +189,26 @@ npm run build  # library build
 
 ## License
 
-MIT
+[MIT](./LICENSE)
+
+## Attribution & Community
+
+While the MIT license allows free use without attribution requirements, we encourage and appreciate developers who acknowledge the original work. This helps foster a healthy open source ecosystem and supports continued development.
+
+**If AI Motion helps your project, please consider:**
+
+- Mentioning this project in your documentation or README
+- Keeping attribution comments in your code
+- Adding a link back to this repository when appropriate
+- Starring the repository to show support
+
+**Contributing Back to the Community:**
+We welcome contributions from the community! Here are ways you can help:
+
+- Report bugs and suggest features through [GitHub Issues](https://github.com/gaomeng1900/ai-motion/issues)
+- Submit pull requests for improvements
+- Share your use cases and examples
+- Help improve documentation
+- Spread the word about the project
+
+Your contributions, whether code, documentation, or feedback, help make AI Motion better for everyone.

@@ -1,14 +1,14 @@
+/**
+ * AI Motion - WebGL2 animated border with AI-style glow effects
+ *
+ * @author Simon<gaomeng1900@gmail.com>
+ * @license MIT
+ * @repository https://github.com/gaomeng1900/ai-motion
+ */
 import { computeBorderGeometry } from './gl/geometry'
 import { createProgram } from './gl/program'
 import fragmentShaderSource from './gl/shaders/fragment.glsl'
 import vertexShaderSource from './gl/shaders/vertex.glsl'
-
-// import { fragmentShaderSource, vertexShaderSource } from './gl/shaders/__legacy'
-
-console.log(
-	`%c🌈 ai-motion ${__AI_MOTION_VERSION__} 🌈`,
-	'background: linear-gradient(90deg, #39b6ff, #bd45fb, #ff5733, #ffd600); color: white; text-shadow: 0 0 2px rgba(0, 0, 0, 0.2); font-weight: bold; font-size: 1em; padding: 2px 12px; border-radius: 6px;'
-)
 
 export type MotionOptions = {
 	/**
@@ -58,6 +58,11 @@ export type MotionOptions = {
 	 * Custom styles for wrapper and canvas elements.
 	 */
 	styles?: Partial<CSSStyleDeclaration>
+	/**
+	 * Skip the greeting message in console.
+	 * @deprecated Don't be a rude person 🤞.
+	 */
+	skipGreeting?: boolean
 }
 
 type GLResources = {
@@ -133,6 +138,8 @@ export class Motion {
 		this.element = this.canvas
 
 		this.setupGL()
+
+		if (!this.options.skipGreeting) this.greet()
 	}
 
 	start(): void {
@@ -446,5 +453,12 @@ export class Motion {
 		this.checkGLError(gl, 'render: after draw call')
 
 		gl.bindVertexArray(null) // @todo optimize
+	}
+
+	private greet() {
+		console.log(
+			`%c🌈 ai-motion ${__AI_MOTION_VERSION__} 🌈`,
+			'background: linear-gradient(90deg, #39b6ff, #bd45fb, #ff5733, #ffd600); color: white; text-shadow: 0 0 2px rgba(0, 0, 0, 0.2); font-weight: bold; font-size: 1em; padding: 2px 12px; border-radius: 6px;'
+		)
 	}
 }
