@@ -1,6 +1,6 @@
 {
 	"name": "ai-motion",
-	"version": "0.4.2",
+	"version": "0.4.3",
 	"private": false,
 	"license": "MIT",
 	"type": "module",
@@ -21,6 +21,7 @@
 		"type": "git",
 		"url": "git+https://github.com/gaomeng1900/ai-motion.git"
 	},
+	"homepage": "https://gaomeng1900.github.io/ai-motion/",
 	"sideEffects": false,
 	"scripts": {
 		"start": "npm run dev",

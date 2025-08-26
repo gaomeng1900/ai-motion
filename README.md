@@ -7,6 +7,8 @@
 
 WebGL2 animated border with AI-style glow effects. Zero dependencies, modern browsers only.
 
+🌈 **[Live Demo](https://gaomeng1900.github.io/ai-motion/)**
+
 ![Demo](public/demo.gif)
 
 ## Install
