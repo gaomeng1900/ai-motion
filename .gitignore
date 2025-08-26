@@ -138,10 +138,6 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# lock files
-package-lock.json
-yarn.lock
-
 # build artifacts
 build/
 build-demo/
