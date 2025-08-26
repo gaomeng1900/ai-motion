@@ -3,6 +3,7 @@ import { defineConfig } from 'vite'
 import { glslLoaderPlugin, replacePlugin } from './vite.plugins'
 
 export default defineConfig({
+	base: './',
 	build: {
 		outDir: 'build-demo',
 		sourcemap: true,

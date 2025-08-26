@@ -3,42 +3,450 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>ai-motion demo</title>
+		<title>AI Motion - Make it pretty</title>
+		<link
+			rel="icon"
+			href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌈</text></svg>"
+		/>
+		<meta
+			name="description"
+			content="WebGL2 animated border with AI-style glow effects. Zero dependencies, modern browsers only."
+		/>
 		<style>
+			:root {
+				/* Theme Colors */
+				--primary: rgb(57, 182, 255);
+				--secondary: rgb(189, 69, 251);
+				--accent-1: rgb(255, 87, 51);
+				--accent-2: rgb(255, 214, 0);
+
+				/* Light Theme */
+				--bg: #ffffff;
+				--text: #1a1a1a;
+				--text-muted: #666666;
+				--overlay-bg: rgba(255, 255, 255, 0.85);
+				--border: rgba(0, 0, 0, 0.1);
+				--code-bg: rgba(0, 0, 0, 0.05);
+			}
+
+			[data-theme='dark'] {
+				/* Dark Theme */
+				--bg: #111;
+				--text: #ffffff;
+				--text-muted: #a0a0a0;
+				--overlay-bg: rgba(0, 0, 0, 0.9);
+				--border: rgba(255, 255, 255, 0.2);
+				--code-bg: rgba(255, 255, 255, 0.08);
+			}
+
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
 			body {
-				/* color: white;
-				background: rgb(27, 27, 27); */
+				font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+				background: var(--bg);
+				color: var(--text);
+				overflow: hidden;
+				width: 100vw;
+				height: 100vh;
+				position: relative;
+			}
+
+			/* Main Container */
+			.container {
+				position: relative;
+				z-index: 10;
+				width: 100vw;
+				height: 100vh;
+				display: grid;
+				place-items: center;
+				text-align: center;
+				padding: 2rem;
+			}
+
+			/* Content Overlay */
+			.content {
+				background: var(--overlay-bg);
+				backdrop-filter: blur(20px);
+				border-radius: 24px;
+				border: 1px solid var(--border);
+				padding: 3rem 2rem;
+				max-width: 600px;
+				width: 100%;
+				box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+			}
+
+			/* Dark mode specific enhancements */
+			[data-theme='dark'] .content {
+				box-shadow:
+					0 20px 40px rgba(0, 0, 0, 0.5),
+					0 0 0 1px rgba(255, 255, 255, 0.1),
+					inset 0 1px 0 rgba(255, 255, 255, 0.1);
+			}
+
+			/* Typography */
+			.title {
+				font-size: clamp(2.5rem, 8vw, 4rem);
+				font-weight: 700;
+				background: linear-gradient(135deg, var(--primary), var(--secondary));
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+				margin-bottom: 1rem;
+				letter-spacing: -0.02em;
+			}
+
+			.tagline {
+				font-size: clamp(1rem, 3vw, 1.25rem);
+				color: var(--text-muted);
+				margin-bottom: 2rem;
+				line-height: 1.5;
+				font-family:
+					'Avenir Next', 'SF Pro Text', 'Helvetica Neue', 'Segoe UI', 'Inter', 'Roboto',
+					'Source Sans Pro', sans-serif;
+				font-style: italic;
+				font-weight: 300;
+				letter-spacing: 0.5px;
+			}
+
+			.glamorous {
+				font-weight: 600;
+				font-size: 1.1em;
+				animation: colorCycle 4s ease-in-out infinite;
+			}
+
+			@keyframes colorCycle {
+				0% {
+					color: rgb(57, 182, 255);
+				}
+				25% {
+					color: rgb(189, 69, 251);
+				}
+				50% {
+					color: rgb(255, 87, 51);
+				}
+				75% {
+					color: rgb(255, 214, 0);
+				}
+				100% {
+					color: rgb(57, 182, 255);
+				}
+			}
+
+			.features {
+				display: flex;
+				justify-content: center;
+				gap: 2rem;
+				margin-bottom: 2rem;
+				flex-wrap: wrap;
+			}
+
+			.feature {
+				font-size: 0.9rem;
+				color: var(--text-muted);
+				display: flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.feature::before {
+				content: '✨';
+				font-size: 1rem;
+			}
+
+			/* Buttons */
+			.actions {
+				display: flex;
+				justify-content: center;
+				gap: 1rem;
+				margin-bottom: 2rem;
+				flex-wrap: wrap;
+			}
+
+			.btn {
+				padding: 0.75rem 1.5rem;
+				border-radius: 12px;
+				text-decoration: none;
+				font-weight: 600;
+				font-size: 0.9rem;
+				transition: all 0.2s ease;
+				border: none;
+				cursor: pointer;
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+			}
+
+			.btn-primary {
+				background: linear-gradient(135deg, var(--primary), var(--secondary));
+				color: white;
+			}
+
+			.btn-secondary {
+				background: var(--code-bg);
+				color: var(--text);
+				border: 1px solid var(--border);
+			}
+
+			.btn:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+			}
+
+			/* Code Block */
+			.install {
+				background: var(--code-bg);
+				border: 1px solid var(--border);
+				border-radius: 12px;
+				padding: 1rem;
+				font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+				font-size: 0.85rem;
+				color: var(--text);
+				margin-bottom: 1rem;
+			}
+
+			/* Credit */
+			.credit {
+				font-size: 0.8rem;
+				color: var(--text-muted);
+				opacity: 0.7;
+			}
+
+			.credit a {
+				color: var(--primary);
+				text-decoration: none;
+				font-weight: 500;
+				transition: all 0.2s ease;
+			}
+
+			.credit a:hover {
+				color: var(--secondary);
+				text-decoration: underline;
+			}
+
+			/* Theme Toggle */
+			.theme-toggle {
+				position: fixed;
+				top: 2rem;
+				right: 2rem;
+				z-index: 20;
+				background: var(--overlay-bg);
+				backdrop-filter: blur(20px);
+				border: 1px solid var(--border);
+				border-radius: 50px;
+				padding: 0.5rem;
+				cursor: pointer;
+				transition: all 0.2s ease;
+			}
+
+			.theme-toggle:hover {
+				opacity: 0.8;
+			}
+
+			.toggle-inner {
+				width: 50px;
+				height: 24px;
+				background: var(--code-bg);
+				border-radius: 12px;
+				position: relative;
+				transition: all 0.3s ease;
+			}
+
+			.toggle-circle {
+				width: 20px;
+				height: 20px;
+				background: linear-gradient(135deg, var(--primary), var(--secondary));
+				border-radius: 50%;
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				transition: all 0.3s ease;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 10px;
+			}
+
+			[data-theme='dark'] .toggle-circle {
+				transform: translateX(26px);
+			}
+
+			/* Responsive */
+			@media (max-width: 768px) {
+				.content {
+					padding: 2rem 1.5rem;
+					margin: 1rem;
+				}
+
+				.features {
+					flex-direction: column;
+					gap: 1rem;
+				}
+
+				.actions {
+					flex-direction: column;
+				}
+
+				.theme-toggle {
+					top: 1rem;
+					right: 1rem;
+				}
+			}
+
+			/* Smooth transitions */
+			* {
+				transition:
+					color 0.3s ease,
+					background-color 0.3s ease,
+					border-color 0.3s ease;
 			}
 		</style>
 	</head>
 	<body>
-		<h1>AI Motion Demo</h1>
-		<p>Minimal demo with auto-resize</p>
+		<!-- Theme Toggle -->
+		<button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+			<div class="toggle-inner">
+				<div class="toggle-circle">🌙</div>
+			</div>
+		</button>
+
+		<!-- Main Content -->
+		<div class="container">
+			<div class="content">
+				<h1 class="title">AI Motion</h1>
+				<p class="tagline">
+					<span class="glamorous">Glamorous</span> WebGL2 animated mask with AI-style border & glow
+					effects. ✨Make your AI pretty.
+				</p>
+
+				<div class="features">
+					<div class="feature">Zero dependencies</div>
+					<div class="feature">Modern browsers</div>
+					<div class="feature">WebGL2 powered</div>
+				</div>
+
+				<div class="actions">
+					<a
+						href="https://github.com/gaomeng1900/ai-motion"
+						class="btn btn-primary"
+						target="_blank"
+					>
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+							<path
+								d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"
+							/>
+						</svg>
+						Source Code
+					</a>
+					<a
+						href="https://www.npmjs.com/package/ai-motion"
+						class="btn btn-secondary"
+						target="_blank"
+					>
+						<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+							<path
+								d="M1.763 0C.786 0 0 .786 0 1.763v20.474C0 23.214.786 24 1.763 24h20.474c.977 0 1.763-.786 1.763-1.763V1.763C24 .786 23.214 0 22.237 0zM5.13 5.323l13.837.019-.009 13.836h-3.464l.01-10.382h-3.456L12.04 19.17H5.113z"
+							/>
+						</svg>
+						NPM Package
+					</a>
+					<a
+						href="https://github.com/gaomeng1900/ai-motion/blob/main/README.md"
+						class="btn btn-secondary"
+						target="_blank"
+					>
+						📚 Documentation
+					</a>
+				</div>
+
+				<div class="install">npm install ai-motion</div>
+
+				<div class="credit">
+					Made with ❤️ by <a href="https://github.com/gaomeng1900" target="_blank">Simon</a>
+				</div>
+			</div>
+		</div>
+
 		<script type="module">
 			import { Motion } from './src/Motion'
 
-			const motion = new Motion({
-				// ratio: 0.5,
-				// mode: 'dark',
-				width: document.documentElement.clientWidth,
-				height: document.documentElement.clientHeight,
-				styles: {
-					position: 'fixed',
-					inset: '0',
-				},
+			// Theme Management
+			const themeToggle = document.getElementById('themeToggle')
+			const toggleCircle = themeToggle.querySelector('.toggle-circle')
+
+			// Detect system preference
+			const prefersDark = window.matchMedia('(prefers-color-scheme: dark)')
+
+			// Initialize theme
+			function initTheme() {
+				const savedTheme = localStorage.getItem('theme')
+				const systemTheme = prefersDark.matches ? 'dark' : 'light'
+				const theme = savedTheme || systemTheme
+
+				setTheme(theme)
+			}
+
+			function setTheme(theme) {
+				document.documentElement.setAttribute('data-theme', theme)
+				localStorage.setItem('theme', theme)
+				toggleCircle.textContent = theme === 'dark' ? '☀️' : '🌙'
+
+				// Update motion mode
+				if (window.motion) {
+					window.motion.dispose()
+					createMotion(theme)
+				}
+			}
+
+			function toggleTheme() {
+				const current = document.documentElement.getAttribute('data-theme')
+				const newTheme = current === 'dark' ? 'light' : 'dark'
+				setTheme(newTheme)
+			}
+
+			// Event listeners
+			themeToggle.addEventListener('click', toggleTheme)
+			prefersDark.addEventListener('change', (e) => {
+				if (!localStorage.getItem('theme')) {
+					setTheme(e.matches ? 'dark' : 'light')
+				}
 			})
 
-			document.body.appendChild(motion.element)
+			// Motion Setup
+			function createMotion(mode = 'light') {
+				const motion = new Motion({
+					width: document.documentElement.clientWidth,
+					height: document.documentElement.clientHeight,
+					mode: mode,
+					styles: {
+						position: 'fixed',
+						inset: '0',
+						zIndex: '1',
+					},
+				})
 
-			// Also update on window resizes (covers DPR changes in many browsers)
-			window.addEventListener('resize', () =>
-				motion.resize(document.documentElement.clientWidth, document.documentElement.clientHeight)
-			)
+				document.body.appendChild(motion.element)
 
-			motion.start()
-			motion.fadeIn()
+				// Auto-resize on window resize
+				window.addEventListener('resize', () =>
+					motion.resize(document.documentElement.clientWidth, document.documentElement.clientHeight)
+				)
 
-			window.motion = motion
+				motion.start()
+				motion.fadeIn()
+
+				window.motion = motion
+			}
+
+			// Initialize
+			initTheme()
+
+			// Create motion with current theme
+			const currentTheme = document.documentElement.getAttribute('data-theme')
+			createMotion(currentTheme)
 		</script>
 	</body>
 </html>
