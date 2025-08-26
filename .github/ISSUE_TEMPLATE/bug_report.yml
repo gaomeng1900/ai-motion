@@ -1,0 +1,48 @@
+name: Bug Report
+description: Report a bug
+title: '[Bug] '
+labels: ['bug']
+body:
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      placeholder: Describe the bug and expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: code
+    attributes:
+      label: Code
+      render: typescript
+      placeholder: Minimal reproduction code
+    validations:
+      required: true
+
+  - type: input
+    id: browser
+    attributes:
+      label: Browser
+      placeholder: 'Chrome 120, Firefox 119, etc.'
+    validations:
+      required: true
+
+  - type: dropdown
+    id: webgl2
+    attributes:
+      label: WebGL2 Support
+      options:
+        - 'Yes'
+        - 'No'
+        - 'Unknown'
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: ai-motion version
+      placeholder: '1.0.0'
+    validations:
+      required: true
