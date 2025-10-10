@@ -1,6 +1,6 @@
 {
 	"name": "ai-motion",
-	"version": "0.4.6",
+	"version": "0.4.7",
 	"private": false,
 	"license": "MIT",
 	"type": "module",
@@ -11,12 +11,12 @@
 		"ai",
 		"visual effects"
 	],
-	"main": "build/motion.js",
-	"module": "build/motion.js",
+	"main": "build/Motion.js",
+	"module": "build/Motion.js",
 	"types": "build/Motion.d.ts",
 	"exports": {
 		".": {
-			"import": "./build/motion.js",
+			"import": "./build/Motion.js",
 			"types": "./build/Motion.d.ts"
 		}
 	},

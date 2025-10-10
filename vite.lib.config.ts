@@ -9,7 +9,7 @@ export default defineConfig({
 			entry: 'src/Motion.ts',
 			name: 'Motion',
 			formats: ['es'],
-			fileName: () => 'motion.js',
+			fileName: () => 'Motion.js',
 		},
 		sourcemap: false,
 		minify: false,
