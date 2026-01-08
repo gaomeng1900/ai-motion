@@ -10,6 +10,14 @@ import { createProgram } from './gl/program'
 import fragmentShaderSource from './gl/shaders/fragment.glsl'
 import vertexShaderSource from './gl/shaders/vertex.glsl'
 
+/**
+ * CSS RGB color string type
+ * @example 'rgb(255, 0, 0)' or 'rgb(255,0,0)'
+ */
+export type CSSRgbString =
+	| `rgb(${number}, ${number}, ${number})`
+	| `rgb(${number},${number},${number})`
+
 export type MotionOptions = {
 	/**
 	 * The width of the motion element.
@@ -34,6 +42,12 @@ export type MotionOptions = {
 	 * @note If you do not know the background color, start with light.
 	 */
 	mode?: 'dark' | 'light'
+	/**
+	 * Color list.
+	 * @default ['rgb(57, 182, 255)', 'rgb(189, 69, 251)', 'rgb(255, 87, 51)', 'rgb(255, 214, 0)']
+	 * @note The color list must be specified with 4 colors in an array, formatted as rgb color strings.
+	 */
+	colors?: [CSSRgbString, CSSRgbString, CSSRgbString, CSSRgbString]
 	/**
 	 * The width of the border.
 	 * @default 8
@@ -82,7 +96,12 @@ type GLResources = {
 /**
  * default light colors
  */
-const COLORS = ['rgb(57, 182, 255)', 'rgb(189, 69, 251)', 'rgb(255, 87, 51)', 'rgb(255, 214, 0)']
+const DEFAULT_COLORS = [
+	'rgb(57, 182, 255)',
+	'rgb(189, 69, 251)',
+	'rgb(255, 87, 51)',
+	'rgb(255, 214, 0)',
+]
 
 /**
  * Parse CSS color string to normalized RGB vec3
@@ -410,7 +429,7 @@ export class Motion {
 		}
 
 		// Set color uniforms
-		const colorVecs = COLORS.map(parseColor)
+		const colorVecs = (this.options.colors || DEFAULT_COLORS).map(parseColor)
 		for (let i = 0; i < colorVecs.length; i++) {
 			gl.uniform3f(gl.getUniformLocation(program, `uColors[${i}]`), ...colorVecs[i])
 		}
