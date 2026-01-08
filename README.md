@@ -25,9 +25,9 @@ npm install ai-motion
 import { Motion } from 'ai-motion'
 
 const motion = new Motion({
-    width: 400,
-    height: 300,
-    mode: 'light'
+	width: 400,
+	height: 300,
+	mode: 'light'
 })
 
 document.body.appendChild(motion.element)
@@ -120,15 +120,16 @@ document.body.appendChild(motion.element)
 
 ```ts
 interface MotionOptions {
-    width?: number          // Canvas width (default: 600)
-    height?: number         // Canvas height (default: 600)
-    ratio?: number          // Device pixel ratio multiplier (default: devicePixelRatio)
-    mode?: 'dark' | 'light' // Color optimization (default: 'light')
-    borderWidth?: number    // Border thickness (default: 8)
-    glowWidth?: number      // Glow effect width (default: 200)
-    borderRadius?: number   // Corner radius (default: 8)
-    classNames?: string     // CSS classes for canvas
-    styles?: Partial<CSSStyleDeclaration> // CSS styles for canvas
+	width?: number // Canvas width (default: 600)
+	height?: number // Canvas height (default: 600)
+	ratio?: number // Device pixel ratio multiplier (default: devicePixelRatio)
+	mode?: 'dark' | 'light' // Color optimization (default: 'light')
+	colors?: [CSSRgbString, CSSRgbString, CSSRgbString, CSSRgbString] // Color list (default: see below)
+	borderWidth?: number // Border thickness (default: 8)
+	glowWidth?: number // Glow effect width (default: 200)
+	borderRadius?: number // Corner radius (default: 8)
+	classNames?: string // CSS classes for canvas
+	styles?: Partial<CSSStyleDeclaration> // CSS styles for canvas
 }
 ```
 
@@ -139,19 +140,54 @@ interface MotionOptions {
 
 Choose based on your background color. Use light mode if you cannot decide.
 
+### Colors
+
+The `colors` option allows you to customize the gradient colors of the animated border. It must be an array of exactly 4 RGB color strings.
+
+**Default colors:**
+
+```ts
+[
+	'rgb(57, 182, 255)', // Cyan
+	'rgb(189, 69, 251)', // Purple
+	'rgb(255, 87, 51)', // Orange
+	'rgb(255, 214, 0)' // Yellow
+]
+```
+
+**Custom colors example:**
+
+```ts
+const motion = new Motion({
+	colors: [
+		'rgb(255, 0, 128)', // Pink
+		'rgb(128, 0, 255)', // Purple
+		'rgb(0, 128, 255)', // Blue
+		'rgb(0, 255, 128)' // Green
+	]
+})
+```
+
+**Important notes:**
+
+- Must provide exactly 4 colors
+- Colors must be in RGB format: `'rgb(r, g, b)'`
+- Values must be integers between 0-255
+- Spaces after commas are optional: both `'rgb(255, 0, 0)'` and `'rgb(255,0,0)'` are valid
+
 ## Examples
 
 ### Fullscreen Background
 
 ```ts
 const motion = new Motion({
-    width: document.documentElement.clientWidth,
-    height: document.documentElement.clientHeight,
-    mode: 'dark',
-    styles: {
-        position: 'fixed',
-        inset: '0',
-    }
+	width: document.documentElement.clientWidth,
+	height: document.documentElement.clientHeight,
+	mode: 'dark',
+	styles: {
+		position: 'fixed',
+		inset: '0'
+	}
 })
 
 document.body.appendChild(motion.element)
